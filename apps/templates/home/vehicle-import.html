@@ -1,0 +1,143 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Vehicle Import Calculator{% endblock %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <h6 class="h2 text-white d-inline-block mb-0">Vehicle Import Calculator</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item active">Vehicle Import Calculator</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-lg-6 col-5 text-right">
+                    <span class="text-white">v2.0.0 | Last updated: 05/06/2024</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="alert alert-info mb-0">
+                        <i class="ni ni-notification-70 mr-2"></i>
+                        <strong>Disclaimer:</strong> This tool is in no way affiliated with the Guyana Revenue Authority (GRA). 
+                        It is an independent calculator which uses publicly available formulas.
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="vehicle-import-form" class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-control-label">CIF (USD)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input type="number" class="form-control" name="cif" required min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-control-label">Exchange Rate (GYD to USD)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input type="number" class="form-control" name="exchange_rate" value="208.50" required min="0" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-control-label">Age of Vehicle</label>
+                                    <select class="form-control" name="vehicle_age" required>
+                                        <option value="">Choose Vehicle Age</option>
+                                        <option value="new">Under 4 Years</option>
+                                        <option value="old">4 Years & Older</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-control-label">Vehicle Type</label>
+                                    <select class="form-control" name="vehicle_type" required>
+                                        <option value="">Choose Vehicle Type</option>
+                                        <option value="car">Car</option>
+                                        <option value="motorcycle">Motorcycle</option>
+                                        <option value="single_cab">Single Cab Pickup</option>
+                                        <option value="double_cab">Double Cab Pickup</option>
+                                        <option value="suv">SUV</option>
+                                        <option value="van">Van</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-control-label">Propulsion Type</label>
+                                    <select class="form-control" name="propulsion" required>
+                                        <option value="">Choose Propulsion Type</option>
+                                        <option value="gasoline">Gasoline</option>
+                                        <option value="electric">Electric</option>
+                                        <option value="diesel">Diesel</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-control-label">Plate Type</label>
+                                    <select class="form-control" name="plate_type" required>
+                                        <option value="P">Private (P)</option>
+                                        <option value="H">Hire (H)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg">Calculate Import Taxes</button>
+                    </form>
+
+                    <!-- Results Section -->
+                    <div id="results" class="mt-4" style="display: none;">
+                        <div class="card bg-gradient-default">
+                            <div class="card-body">
+                                <h4 class="text-white">Calculation Results</h4>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p class="text-white mb-1">CIF Value (GYD): $<span id="cif_gyd"></span></p>
+                                        <p class="text-white mb-1">Excise Tax: $<span id="excise_tax"></span></p>
+                                        <p class="text-white mb-1">VAT: $<span id="vat"></span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="text-white mb-1">Environmental Tax: $<span id="environmental_tax"></span></p>
+                                        <p class="text-white mb-1">Custom Duty: $<span id="custom_duty"></span></p>
+                                        <p class="text-white mb-1">Total Cost: $<span id="total_cost"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

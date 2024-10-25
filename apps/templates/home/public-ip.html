@@ -1,0 +1,56 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Public IP{% endblock %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <h6 class="h2 text-white d-inline-block mb-0">Public IP</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item active">Public IP</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-lg-6 col-5 text-right">
+                    <span class="text-white">v1.0.0 | Last updated: 25/10/2024</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="alert alert-info mb-0">
+                        <i class="ni ni-notification-70 mr-2"></i>
+                        <strong>Note:</strong> This tool displays your public IP address.
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h4>Your Public IP Address is:</h4>
+                    <p id="public-ip" class="lead">Loading...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('public-ip').textContent = data.ip;
+        })
+        .catch(error => {
+            document.getElementById('public-ip').textContent = 'Unable to retrieve IP address';
+        });
+</script>
+{% endblock %}

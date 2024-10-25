@@ -1,0 +1,74 @@
+/* Sidenav Styles */
+.sidenav {
+    background-color: #f8f9fe;
+    transition: all 0.3s ease;
+}
+
+.sidenav .navbar-brand {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.sidenav .navbar-brand img {
+    height: 36px;
+    width: auto;
+}
+
+.sidenav .navbar-brand span {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #32325d;
+}
+
+.navbar-heading {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding-left: 1rem;
+}
+
+.nav-link {
+    padding: 0.675rem 1rem;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.nav-link i {
+    min-width: 2.25rem;
+    font-size: 0.9375rem;
+    line-height: 1.5rem;
+}
+
+.nav-link.active {
+    background: linear-gradient(87deg, #11cdef 0, #1171ef 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 6px rgba(50, 50, 93, .11), 0 1px 3px rgba(0, 0, 0, .08);
+}
+
+.nav-link.active i,
+.nav-link.active span {
+    color: #fff !important;
+}
+
+/* Dark Mode Styles */
+.dark-mode .sidenav {
+    background-color: #1a1c24;
+}
+
+.dark-mode .sidenav .navbar-brand span {
+    color: #fff;
+}
+
+.dark-mode .navbar-heading {
+    color: #8898aa;
+}
+
+.dark-mode .nav-link {
+    color: #fff;
+}
+
+.dark-mode .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}

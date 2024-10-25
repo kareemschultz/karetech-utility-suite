@@ -1,0 +1,77 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}DNS Lookup{% endblock %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <h6 class="h2 text-white d-inline-block mb-0">DNS Lookup</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item active">DNS Lookup</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-lg-6 col-5 text-right">
+                    <span class="text-white">v1.0.0 | Last updated: 25/10/2024</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="alert alert-info mb-0">
+                        <i class="ni ni-notification-70 mr-2"></i>
+                        <strong>Note:</strong> This tool allows you to perform DNS lookups.
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="dns-lookup-form" class="needs-validation" novalidate>
+                        <div class="form-group">
+                            <label class="form-control-label">Domain Name</label>
+                            <input type="text" class="form-control" name="domain" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg">Lookup</button>
+                    </form>
+
+                    <!-- Results Section -->
+                    <div id="results" class="mt-4" style="display: none;">
+                        <div class="card bg-gradient-default">
+                            <div class="card-body">
+                                <h4 class="text-white">DNS Lookup Results</h4>
+                                <pre id="dns-results" class="text-white"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('dns-lookup-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const domain = event.target.domain.value;
+        fetch(`/api/dns-lookup?domain=${domain}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('results').style.display = 'block';
+                document.getElementById('dns-results').textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                document.getElementById('results').style.display = 'block';
+                document.getElementById('dns-results').textContent = 'Error performing DNS lookup';
+            });
+    });
+</script>
+{% endblock %}

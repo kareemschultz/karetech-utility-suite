@@ -1,5 +1,11 @@
 <nav class="navbar navbar-top navbar-expand navbar-dark bg-primary border-bottom">
   <div class="container-fluid">
+    <!-- Brand -->
+    <div class="navbar-brand">
+      <img src="/static/assets/img/brand/ks-logo.png" alt="KS Tools" class="navbar-brand-img" style="height: 40px;">
+      <span class="ml-2">Kareem's Tech Tools</span>
+    </div>
+
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <!-- Search form -->
       <form class="navbar-search navbar-search-light form-inline mr-sm-3" id="navbar-search-main">
@@ -8,17 +14,18 @@
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fas fa-search"></i></span>
             </div>
-            <input class="form-control" placeholder="Search" type="text">
+            <input class="form-control" placeholder="Search tools..." type="text">
           </div>
         </div>
         <button type="button" class="close" data-action="search-close" data-target="#navbar-search-main" aria-label="Close">
           <span aria-hidden="true">×</span>
         </button>
       </form>
+
       <!-- Navbar links -->
       <ul class="navbar-nav align-items-center ml-md-auto">
+        <!-- Mobile Sidenav toggler -->
         <li class="nav-item d-xl-none">
-          <!-- Sidenav toggler -->
           <div class="pr-3 sidenav-toggler sidenav-toggler-dark" data-action="sidenav-pin" data-target="#sidenav-main">
             <div class="sidenav-toggler-inner">
               <i class="sidenav-toggler-line"></i>
@@ -27,17 +34,25 @@
             </div>
           </div>
         </li>
+
+        <!-- Mobile search -->
         <li class="nav-item d-sm-none">
           <a class="nav-link" href="#" data-action="search-show" data-target="#navbar-search-main">
             <i class="ni ni-zoom-split-in"></i>
           </a>
         </li>
-        <!-- Quick access shortcuts -->
+
+        <!-- Tools Dropdown -->
         <li class="nav-item dropdown">
           <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="ni ni-ungroup"></i>
+            <i class="ni ni-apps"></i>
+            <span class="nav-link-text">Quick Tools</span>
           </a>
           <div class="dropdown-menu dropdown-menu-lg dropdown-menu-dark bg-default dropdown-menu-right">
+            <!-- Calculators Section -->
+            <div class="px-4 py-2">
+              <h6 class="text-sm text-muted m-0">Calculators</h6>
+            </div>
             <div class="row shortcuts px-4">
               <a href="/salary-calculator" class="col-4 shortcut-item">
                 <span class="shortcut-media avatar rounded-circle bg-gradient-red">
@@ -45,6 +60,25 @@
                 </span>
                 <small>Salary Calc</small>
               </a>
+              <a href="/vehicle-import" class="col-4 shortcut-item">
+                <span class="shortcut-media avatar rounded-circle bg-gradient-purple">
+                  <i class="ni ni-delivery-fast"></i>
+                </span>
+                <small>Vehicle Import</small>
+              </a>
+              <a href="/currency-converter" class="col-4 shortcut-item">
+                <span class="shortcut-media avatar rounded-circle bg-gradient-green">
+                  <i class="ni ni-credit-card"></i>
+                </span>
+                <small>Currency</small>
+              </a>
+            </div>
+
+            <!-- Network Tools Section -->
+            <div class="px-4 py-2">
+              <h6 class="text-sm text-muted m-0">Network Tools</h6>
+            </div>
+            <div class="row shortcuts px-4">
               <a href="/speedtest" class="col-4 shortcut-item">
                 <span class="shortcut-media avatar rounded-circle bg-gradient-orange">
                   <i class="ni ni-speedometer"></i>
@@ -58,25 +92,60 @@
                 <small>Public IP</small>
               </a>
               <a href="/dns-lookup" class="col-4 shortcut-item">
-                <span class="shortcut-media avatar rounded-circle bg-gradient-green">
+                <span class="shortcut-media avatar rounded-circle bg-gradient-teal">
                   <i class="ni ni-atom"></i>
                 </span>
                 <small>DNS Lookup</small>
               </a>
-              <a href="/vehicle-import" class="col-4 shortcut-item">
-                <span class="shortcut-media avatar rounded-circle bg-gradient-purple">
-                  <i class="ni ni-delivery-fast"></i>
-                </span>
-                <small>Vehicle</small>
-              </a>
-              <a href="/" class="col-4 shortcut-item">
+            </div>
+
+            <!-- Utility Tools Section -->
+            <div class="px-4 py-2">
+              <h6 class="text-sm text-muted m-0">Utilities</h6>
+            </div>
+            <div class="row shortcuts px-4">
+              <a href="/qr-generator" class="col-4 shortcut-item">
                 <span class="shortcut-media avatar rounded-circle bg-gradient-yellow">
-                  <i class="ni ni-chart-pie-35"></i>
+                  <i class="ni ni-square-pin"></i>
                 </span>
-                <small>Dashboard</small>
+                <small>QR Code</small>
+              </a>
+              <a href="/hash-calculator" class="col-4 shortcut-item">
+                <span class="shortcut-media avatar rounded-circle bg-gradient-pink">
+                  <i class="ni ni-key-25"></i>
+                </span>
+                <small>Hash Calc</small>
+              </a>
+              <a href="/json-formatter" class="col-4 shortcut-item">
+                <span class="shortcut-media avatar rounded-circle bg-gradient-primary">
+                  <i class="ni ni-align-left-2"></i>
+                </span>
+                <small>JSON Format</small>
               </a>
             </div>
+
+            <!-- Dashboard Link -->
+            <div class="dropdown-divider"></div>
+            <a href="/" class="dropdown-item text-center">
+              <i class="ni ni-chart-pie-35 mr-2"></i>
+              <span>Dashboard</span>
+            </a>
           </div>
+        </li>
+
+        <!-- Theme Toggle -->
+        <li class="nav-item">
+          <a class="nav-link" href="#" id="theme-toggle">
+            <i class="ni ni-moon-stars"></i>
+          </a>
+        </li>
+
+        <!-- About/Info -->
+        <li class="nav-item">
+          <a class="nav-link" href="/about">
+            <i class="ni ni-single-02"></i>
+            <span class="nav-link-text">About</span>
+          </a>
         </li>
       </ul>
     </div>

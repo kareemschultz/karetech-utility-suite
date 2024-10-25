@@ -1,0 +1,64 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}QR Generator{% endblock %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <h6 class="h2 text-white d-inline-block mb-0">QR Generator</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item active">QR Generator</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-lg-6 col-5 text-right">
+                    <span class="text-white">v1.0.0 | Last updated: 25/10/2024</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col-xl-6 col-lg-8 col-md-10 mx-auto">
+            <div class="card bg-secondary shadow border-0">
+                <div class="card-body px-lg-5 py-lg-5">
+                    <form id="qr-generator-form" class="needs-validation" novalidate>
+                        <div class="form-group">
+                            <label class="form-control-label">Text to Encode</label>
+                            <input type="text" class="form-control" name="text" required>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary my-4">Generate QR Code</button>
+                        </div>
+                    </form>
+
+                    <!-- QR Code Result -->
+                    <div id="qr-result" class="mt-4" style="display: none;">
+                        <h4 class="text-center">Your QR Code</h4>
+                        <div class="text-center">
+                            <img id="qr-code" src="" alt="QR Code">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('qr-generator-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const text = event.target.text.value;
+        const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(text)}&size=200x200`;
+        document.getElementById('qr-code').src = qrCodeUrl;
+        document.getElementById('qr-result').style.display = 'block';
+    });
+</script>
+{% endblock %}
