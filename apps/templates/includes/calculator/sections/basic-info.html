@@ -1,0 +1,30 @@
+<!-- templates/includes/calculator/sections/basic-info.html -->
+<div class="form-section">
+    <h4 class="mb-4">Basic Information</h4>
+    <div class="alert alert-secondary mb-4">
+        <i class="ni ni-notification-70 mr-2"></i>
+        Enter your base monthly salary before any allowances or deductions.
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-control-label">Basic Monthly Salary</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">$</span>
+                    </div>
+                    <input type="number" 
+                           class="form-control" 
+                           id="basic_salary"
+                           name="basic_salary" 
+                           required 
+                           min="0"
+                           placeholder="e.g., 150000">
+                </div>
+                <small class="form-text text-muted">
+                    Enter your base salary without any allowances or overtime
+                </small>
+            </div>
+        </div>
+    </div>
+</div>

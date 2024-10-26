@@ -1,0 +1,48 @@
+<!-- templates/includes/calculator/sections/deductions.html -->
+<div class="form-section">
+    <h4 class="mb-4">Other Deductions</h4>
+    <div class="alert alert-warning mb-4">
+        <i class="ni ni-credit-card mr-2"></i>
+        Enter any additional monthly deductions such as loan payments or GPSU (Guyana Public Service Union) membership fees.
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-control-label">Loan Payment Deduction</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">$</span>
+                    </div>
+                    <input type="number" 
+                           class="form-control" 
+                           name="loan_deduction" 
+                           value="0" 
+                           min="0"
+                           placeholder="e.g., 25000">
+                </div>
+                <small class="form-text text-muted">
+                    Enter total monthly loan payment amounts (if any)
+                </small>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-control-label">GPSU Deduction</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">$</span>
+                    </div>
+                    <input type="number" 
+                           class="form-control" 
+                           name="gpsu_deduction" 
+                           value="0" 
+                           min="0"
+                           placeholder="e.g., 1000">
+                </div>
+                <small class="form-text text-muted">
+                    GPSU (Guyana Public Service Union) membership is typically 1% of basic salary
+                </small>
+            </div>
+        </div>
+    </div>
+</div>

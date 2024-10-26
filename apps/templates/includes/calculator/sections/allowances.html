@@ -1,0 +1,46 @@
+<!-- templates/includes/calculator/sections/allowances.html -->
+<div class="form-section">
+    <h4 class="mb-4">Allowances</h4>
+    <div class="alert alert-info mb-4">
+        <i class="ni ni-money-coins mr-2"></i>
+        <strong>Note:</strong> Taxable allowances contribute to your tax calculation, non-taxable allowances don't.
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-control-label">Number of Taxable Allowances</label>
+                <input type="number" 
+                       class="form-control" 
+                       id="num_taxable" 
+                       name="num_taxable" 
+                       min="0" 
+                       max="5" 
+                       value="0"
+                       onchange="SalaryCalculator.generateAllowanceFields('taxable')">
+                <small class="form-text text-muted">
+                    <strong>Examples:</strong> Duty, Housing, Acting allowances, Overtime, Uniform allowance (max 5)
+                </small>
+            </div>
+            <!-- Container for dynamic taxable allowance fields -->
+            <div id="taxable_allowances_container"></div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-control-label">Number of Non-Taxable Allowances</label>
+                <input type="number" 
+                       class="form-control" 
+                       id="num_non_taxable" 
+                       name="num_non_taxable" 
+                       min="0" 
+                       max="5" 
+                       value="0"
+                       onchange="SalaryCalculator.generateAllowanceFields('non_taxable')">
+                <small class="form-text text-muted">
+                    <strong>Examples:</strong> Travel, Entertainment, Station, Subsistence, Meal allowances (max 5)
+                </small>
+            </div>
+            <!-- Container for dynamic non-taxable allowance fields -->
+            <div id="non_taxable_allowances_container"></div>
+        </div>
+    </div>
+</div>

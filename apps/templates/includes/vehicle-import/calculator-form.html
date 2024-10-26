@@ -1,0 +1,102 @@
+<!-- templates/includes/vehicle-import/calculator-form.html -->
+<div class="card">
+    <div class="card-body">
+        <form id="vehicle-import-form" class="needs-validation" novalidate>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-control-label">CIF (USD)</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">$</span>
+                            </div>
+                            <input type="number" class="form-control" name="cif" required min="0">
+                        </div>
+                        <small class="form-text text-muted">Cost, Insurance, and Freight value in USD</small>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-control-label">Exchange Rate (GYD to USD)</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">$</span>
+                            </div>
+                            <input type="number" class="form-control" name="exchange_rate" value="208.50" required min="0" step="0.01">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-control-label">Age of Vehicle</label>
+                        <select class="form-control" name="vehicle_age" required>
+                            <option value="">Choose Vehicle Age</option>
+                            <option value="new">Under 4 Years</option>
+                            <option value="old">4 Years & Older</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-control-label">Vehicle Type</label>
+                        <select class="form-control" name="vehicle_type" required>
+                            <option value="">Choose Vehicle Type</option>
+                            <option value="car">Car</option>
+                            <option value="motorcycle">Motorcycle</option>
+                            <option value="single_cab">Single Cab Pickup</option>
+                            <option value="double_cab">Double Cab Pickup</option>
+                            <option value="suv">SUV</option>
+                            <option value="van">Van</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-control-label">Engine Size</label>
+                        <select class="form-control" name="engine_cc" required>
+                            <option value="">Choose Engine CC</option>
+                            <option value="0-1000">0cc - 1000cc</option>
+                            <option value="1001-1500">1001cc - 1500cc</option>
+                            <option value="1501-1800">1501cc - 1800cc</option>
+                            <option value="1801-2000">1801cc - 2000cc</option>
+                            <option value="2001-3000">2001cc - 3000cc</option>
+                            <option value="3000+">Over 3000cc</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-control-label">Propulsion Type</label>
+                        <select class="form-control" name="propulsion" required>
+                            <option value="">Choose Propulsion Type</option>
+                            <option value="gasoline">Gasoline</option>
+                            <option value="electric">Electric</option>
+                            <option value="diesel">Diesel</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-control-label">Plate Type</label>
+                        <select class="form-control" name="plate_type" required>
+                            <option value="P">Private (P)</option>
+                            <option value="H">Hire (H)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="ni ni-calculator mr-2"></i>Calculate Import Taxes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
