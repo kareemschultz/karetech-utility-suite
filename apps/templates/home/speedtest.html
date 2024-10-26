@@ -3,28 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Speed Test</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <title>Internet Speed Test</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/argon-dashboard/assets/css/argon.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/static/assets/js/speedtest.js"></script> <!-- Ensure this path is correct -->
 </head>
 <body>
-    <header>
-        <h1>Speed Test</h1>
-        <!-- Add your navigation here -->
-    </header>
-    
-    <main>
-        <div style="text-align:center;">
-            <div style="min-height:360px;">
-                <div style="width:100%;height:0;padding-bottom:50%;position:relative;">
-                    <iframe style="border:none;position:absolute;top:0;left:0;width:100%;height:100%;min-height:360px;border:none;overflow:hidden !important;" src="//openspeedtest.com/speedtest"></iframe>
-                </div>
-            </div>
-            Provided by <a href="https://openspeedtest.com">OpenSpeedtest.com</a>
-        </div>
-    </main>
 
-    <footer>
-        <p>&copy; 2024 Your Website Name</p>
-    </footer>
+<div class="container mt-5">
+    <h1 class="text-center">Internet Speed Test</h1>
+    <div class="text-center mb-4">
+        <p class="lead">Test your internet speed using the tool below.</p>
+    </div>
+
+    <!-- Information Section -->
+    <div class="alert alert-info">
+        <h5>What is Internet Speed Testing?</h5>
+        <p>
+            Internet speed tests measure the speed of your internet connection, providing insights into download and upload speeds as well as latency (ping). This information helps you understand the performance of your internet service.
+        </p>
+        <p>
+            Note: Results can vary based on various factors, including network congestion, time of day, and distance from the testing server.
+        </p>
+    </div>
+
+    <!-- OST Widget Code -->
+    <div class="text-center mb-4">
+        <div style="min-height:360px;">
+            <div style="width:100%;height:0;padding-bottom:50%;position:relative;">
+                <iframe style="border:none;position:absolute;top:0;left:0;width:100%;height:100%;min-height:360px;border:none;overflow:hidden !important;" src="//openspeedtest.com/speedtest"></iframe>
+            </div>
+        </div>
+        <p class="small">Provided by <a href="https://openspeedtest.com" target="_blank">OpenSpeedtest.com</a></p>
+    </div>
+
+    <!-- Notes Section -->
+    <div class="alert alert-warning">
+        <h5>Important Notes:</h5>
+        <ul>
+            <li>Please ensure you are not using other applications that may consume bandwidth during the test.</li>
+            <li>If the results seem inaccurate, try running the test at different times.</li>
+            <li>This speed test is meant for informational purposes only and should not be used as a definitive measure of your internet performance.</li>
+        </ul>
+    </div>
+</div>
+
 </body>
 </html>

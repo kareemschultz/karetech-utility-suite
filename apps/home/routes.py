@@ -193,3 +193,40 @@ def calculate_vehicle_import():
             'success': False,
             'error': str(e)
         }), 400
+        
+@blueprint.route('/public-ip')
+def public_ip():
+    return render_template('home/public-ip.html', segment='public-ip')
+
+@blueprint.route('/get-ip-info', methods=['GET'])
+def get_ip_info():
+    try:
+        response = requests.get('https://ipapi.co/json/')
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+    
+    
+@blueprint.route('/speedtest', methods=['GET'])
+def speedtest_page():
+    return render_template('home/speedtest.html')
+
+@blueprint.route('/run-speedtest', methods=['POST'])
+def run_speedtest():
+    try:
+        st = speedtest.Speedtest()
+        st.get_best_server()
+        download_speed = st.download() / 1_000_000  # Convert to Mbps
+        upload_speed = st.upload() / 1_000_000  # Convert to Mbps
+        ping = st.results.ping
+        
+        return jsonify({
+            'success': True,
+            'results': {
+                'download': round(download_speed, 2),
+                'upload': round(upload_speed, 2),
+                'ping': round(ping, 2)
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
