@@ -1,0 +1,103 @@
+<!-- templates/home/contact.html -->
+{% extends "layouts/base.html" %}
+
+{% block title %}Contact{% endblock %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <h6 class="h2 text-white d-inline-block mb-0">Contact</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item active">Contact</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col-xl-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Get in Touch</h3>
+                </div>
+                <div class="card-body">
+                    <form id="contact-form" method="POST">
+                        <div class="alert alert-info">
+                            <i class="ni ni-bell-55 mr-2"></i>
+                            Fill out the form below and we'll get back to you as soon as possible.
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-control-label">Name</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-control-label">Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-control-label">Subject</label>
+                            <select class="form-control" name="subject" required>
+                                <option value="">Select a subject...</option>
+                                <option value="general">General Inquiry</option>
+                                <option value="support">Technical Support</option>
+                                <option value="feedback">Feedback</option>
+                                <option value="business">Business Proposal</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-control-label">Message</label>
+                            <textarea class="form-control" name="message" rows="5" required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ni ni-send mr-2"></i>Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Contact Information</h3>
+                </div>
+                <div class="card-body">
+                    <div class="info-card mb-4">
+                        <h5><i class="ni ni-email-83 mr-2"></i>Email</h5>
+                        <p class="mb-0">contact@example.com</p>
+                    </div>
+
+                    <div class="info-card mb-4">
+                        <h5><i class="ni ni-pin-3 mr-2"></i>Location</h5>
+                        <p class="mb-0">Georgetown, Guyana</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h5><i class="ni ni-time-alarm mr-2"></i>Response Time</h5>
+                        <p class="mb-0">Usually within 24-48 hours</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='assets/js/contact.js') }}"></script>
+{% endblock %}

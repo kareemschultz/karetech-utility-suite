@@ -1,0 +1,29 @@
+<!-- templates/includes/dashboard/traffic-tables.html -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">Traffic Overview</h5>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Visitors</th>
+                    <th>Page Views</th>
+                    <th>Bounce Rate</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Add dynamic data rows here -->
+                {% for entry in traffic_data %}
+                <tr>
+                    <td>{{ entry.date }}</td>
+                    <td>{{ entry.visitors }}</td>
+                    <td>{{ entry.page_views }}</td>
+                    <td>{{ entry.bounce_rate }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,99 @@
+<!-- templates/home/about.html -->
+{% extends "layouts/base.html" %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <h6 class="h2 text-white d-inline-block mb-0">About</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item active">About</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <!-- About Section -->
+    <div class="row">
+        <div class="col-xl-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">About Kareem's Tech Tools</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="ni ni-bell-55 mr-2"></i>
+                        Version 2.0.0 | Last Updated: May 2024
+                    </div>
+                    
+                    <h4 class="mt-4">Overview</h4>
+                    <p>This suite of utility tools is designed to help users with various calculations and technical tasks. From salary calculations to network diagnostics, we provide accurate and efficient tools for your needs.</p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card bg-gradient-primary text-white">
+                                <div class="card-body">
+                                    <h5 class="text-white">Features</h5>
+                                    <ul class="list-unstyled mt-3">
+                                        <li><i class="ni ni-check-bold mr-2"></i>Salary Calculator</li>
+                                        <li><i class="ni ni-check-bold mr-2"></i>Vehicle Import Calculator</li>
+                                        <li><i class="ni ni-check-bold mr-2"></i>Network Tools</li>
+                                        <li><i class="ni ni-check-bold mr-2"></i>Currency Converter</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-gradient-info text-white">
+                                <div class="card-body">
+                                    <h5 class="text-white">Technologies</h5>
+                                    <ul class="list-unstyled mt-3">
+                                        <li><i class="ni ni-bullet-list-67 mr-2"></i>Python/Flask Backend</li>
+                                        <li><i class="ni ni-bullet-list-67 mr-2"></i>Modern UI Design</li>
+                                        <li><i class="ni ni-bullet-list-67 mr-2"></i>Real-time Calculations</li>
+                                        <li><i class="ni ni-bullet-list-67 mr-2"></i>Responsive Layout</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Developer Info</h3>
+                </div>
+                <div class="card-body text-center">
+                    <img src="{{ url_for('static', filename='assets/img/brand/ks-logo.png') }}" 
+                         alt="Developer Logo" 
+                         class="img-fluid mb-3" 
+                         style="max-width: 150px;">
+                    <h4>Kareem Schultz</h4>
+                    <p class="text-muted">Full Stack Developer</p>
+                    <div class="social-links mt-4">
+                        <a href="https://github.com/yourusername" class="btn btn-icon btn-primary" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="https://linkedin.com/in/yourusername" class="btn btn-icon btn-info" target="_blank">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

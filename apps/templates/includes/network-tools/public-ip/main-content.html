@@ -1,0 +1,82 @@
+<!-- templates/includes/network-tools/public-ip/main-content.html -->
+<div class="row">
+    <!-- IP Address Card -->
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h6 class="text-uppercase text-muted ls-1 mb-1">Current IP Address</h6>
+                        <h5 class="h3 mb-0">Your Public IP</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="loading-indicator" class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <p class="mt-2">Fetching your IP information...</p>
+                </div>
+
+                <div id="ip-details" style="display: none;">
+                    <!-- IP Address Display -->
+                    <div class="mb-4">
+                        <div class="bg-gradient-primary text-white rounded p-4 text-center">
+                            <h2 class="mb-0" id="ip-address">-</h2>
+                            <small class="text-white-50">Your Public IP Address</small>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Information Cards -->
+                    <div class="row">
+                        <!-- Location Information -->
+                        <div class="col-md-4">
+                            <div class="card info-card location-info">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-map-marker-alt mr-2"></i>Location</h5>
+                                    <ul class="list-unstyled mt-3">
+                                        <li class="mb-2">Country: <span id="country" class="font-weight-bold">-</span></li>
+                                        <li class="mb-2">Region: <span id="region" class="font-weight-bold">-</span></li>
+                                        <li class="mb-2">City: <span id="city" class="font-weight-bold">-</span></li>
+                                        <li class="mb-2">Postal: <span id="postal" class="font-weight-bold">-</span></li>
+                                        <li>Timezone: <span id="timezone" class="font-weight-bold">-</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Network Information -->
+                        <div class="col-md-4">
+                            <div class="card info-card network-info">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-network-wired mr-2"></i>Network</h5>
+                                    <ul class="list-unstyled mt-3">
+                                        <li class="mb-2">ISP: <span id="isp" class="font-weight-bold">-</span></li>
+                                        <li class="mb-2">Organization: <span id="org" class="font-weight-bold">-</span></li>
+                                        <li class="mb-2">ASN: <span id="asn" class="font-weight-bold">-</span></li>
+                                        <li>Hostname: <span id="hostname" class="font-weight-bold">-</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connection Information -->
+                        <div class="col-md-4">
+                            <div class="card info-card coordinates-info">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-compass mr-2"></i>Coordinates</h5>
+                                    <ul class="list-unstyled mt-3">
+                                        <li class="mb-2">Latitude: <span id="latitude" class="font-weight-bold">-</span></li>
+                                        <li class="mb-2">Longitude: <span id="longitude" class="font-weight-bold">-</span></li>
+                                        <li>Accuracy: <span id="accuracy" class="font-weight-bold">-</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

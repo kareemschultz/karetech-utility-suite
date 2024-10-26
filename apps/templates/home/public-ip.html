@@ -1,6 +1,29 @@
+<!-- templates/home/public-ip.html -->
 {% extends "layouts/base.html" %}
 
-{% block title %}Public IP{% endblock %}
+{% block title %}Public IP Information{% endblock %}
+
+{% block stylesheets %}
+{{ super() }}
+<style>
+    .info-card {
+        transition: all 0.3s ease;
+    }
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.175);
+    }
+    .location-info {
+        border-left: 4px solid #5e72e4;
+    }
+    .network-info {
+        border-left: 4px solid #2dce89;
+    }
+    .coordinates-info {
+        border-left: 4px solid #fb6340;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="header bg-primary pb-6">
@@ -8,7 +31,7 @@
         <div class="header-body">
             <div class="row align-items-center py-4">
                 <div class="col-lg-6 col-7">
-                    <h6 class="h2 text-white d-inline-block mb-0">Public IP</h6>
+                    <h6 class="h2 text-white d-inline-block mb-0">Public IP Information</h6>
                     <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
                         <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
                             <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
@@ -17,7 +40,9 @@
                     </nav>
                 </div>
                 <div class="col-lg-6 col-5 text-right">
-                    <span class="text-white">v1.0.0 | Last updated: 25/10/2024</span>
+                    <button class="btn btn-sm btn-neutral" onclick="refreshIPInfo()">
+                        <i class="fas fa-sync-alt mr-2"></i>Refresh Information
+                    </button>
                 </div>
             </div>
         </div>
@@ -25,69 +50,18 @@
 </div>
 
 <div class="container-fluid mt--6">
-    <div class="row">
-        <div class="col-xl-12">
-            <div class="card">
-                <div class="card-header">
-                    <div class="alert alert-info mb-0">
-                        <i class="ni ni-notification-70 mr-2"></i>
-                        <strong>Note:</strong> This tool displays your public IP address and related information.
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h4>Your Public IP Address is:</h4>
-                    <p id="public-ip" class="lead">Loading...</p>
-                    <h4>Additional Information:</h4>
-                    <div id="ip-info" class="mt-3"></div>
-                    <button id="fetch-ip-info" class="btn btn-primary mt-3">Get IP Info</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Information Section -->
+    {% include 'includes/network-tools/public-ip/info-section.html' %}
+    
+    <!-- Main Content -->
+    {% include 'includes/network-tools/public-ip/main-content.html' %}
+    
+    <!-- Map Section -->
+    {% include 'includes/network-tools/public-ip/map-section.html' %}
 </div>
+{% endblock %}
 
-<script>
-    // Fetch public IP address
-    fetch('https://api.ipify.org?format=json')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('public-ip').textContent = data.ip;
-        })
-        .catch(error => {
-            document.getElementById('public-ip').textContent = 'Unable to retrieve IP address';
-        });
-
-    // Fetch additional IP information
-    document.getElementById('fetch-ip-info').addEventListener('click', function() {
-        fetch('/get-ip-info')
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    document.getElementById('ip-info').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
-                } else {
-                    displayIpInfo(data);
-                }
-            })
-            .catch(error => {
-                document.getElementById('ip-info').innerHTML = `<div class="alert alert-danger">${error}</div>`;
-            });
-    });
-
-    function displayIpInfo(data) {
-        const ipInfoContainer = document.getElementById('ip-info');
-        ipInfoContainer.innerHTML = `
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">IP Address: ${data.ip}</h5>
-                    <p>City: ${data.city}</p>
-                    <p>Region: ${data.region}</p>
-                    <p>Country: ${data.country}</p>
-                    <p>ISP: ${data.org}</p>
-                    <p>Connection Type: ${data.connection || 'N/A'}</p>
-                    <p>Network: ${data.network || 'N/A'}</p>
-                </div>
-            </div>
-        `;
-    }
-</script>
+{% block javascripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='assets/js/public-ip.js') }}"></script>
 {% endblock %}
