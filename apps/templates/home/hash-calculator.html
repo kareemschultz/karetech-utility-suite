@@ -1,58 +1,78 @@
 {% extends "layouts/base.html" %}
 
-{% block title %}Hash Calculator{% endblock %}
+{% block stylesheets %}
+{{ super() }}
+<style>
+    .hash-output {
+        font-family: monospace;
+        word-break: break-all;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="header bg-primary pb-6">
+<div class="header bg-gradient-info pb-8 pt-5 pt-md-8">
     <div class="container-fluid">
         <div class="header-body">
-            <div class="row align-items-center py-4">
-                <div class="col-lg-6 col-7">
-                    <h6 class="h2 text-white d-inline-block mb-0">Hash Calculator</h6>
-                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
-                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-                            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
-                            <li class="breadcrumb-item active">Hash Calculator</li>
-                        </ol>
-                    </nav>
-                </div>
-                <div class="col-lg-6 col-5 text-right">
-                    <span class="text-white">v1.0.0 | Last updated: 25/10/2024</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="card bg-secondary shadow">
+                        <div class="card-header bg-white border-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h3 class="mb-0">Hash Calculator</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <form id="hash-form">
+                                <div class="form-group">
+                                    <label class="form-control-label">Input Text</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <i class="ni ni-key-25"></i>
+                                            </span>
+                                        </div>
+                                        <textarea class="form-control" id="hash-input" rows="4" 
+                                                  placeholder="Enter text to hash"></textarea>
+                                    </div>
+                                </div>
 
-<div class="container-fluid mt--6">
-    <div class="row">
-        <div class="col-xl-6 col-lg-8 col-md-10 mx-auto">
-            <div class="card bg-secondary shadow border-0">
-                <div class="card-body px-lg-5 py-lg-5">
-                    <form id="hash-calculator-form" class="needs-validation" novalidate>
-                        <div class="form-group">
-                            <label class="form-control-label">Text to Hash</label>
-                            <input type="text" class="form-control" name="text" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-control-label">Hash Algorithm</label>
-                            <select class="form-control" name="algorithm" required>
-                                <option value="md5">MD5</option>
-                                <option value="sha1">SHA-1</option>
-                                <option value="sha256">SHA-256</option>
-                                <option value="sha512">SHA-512</option>
-                            </select>
-                        </div>
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary my-4">Calculate Hash</button>
-                        </div>
-                    </form>
+                                <div class="form-group">
+                                    <label class="form-control-label">Hash Algorithm</label>
+                                    <select class="form-control" id="hash-algorithm">
+                                        <option value="md5">MD5</option>
+                                        <option value="sha1">SHA-1</option>
+                                        <option value="sha256" selected>SHA-256</option>
+                                        <option value="sha512">SHA-512</option>
+                                    </select>
+                                </div>
 
-                    <!-- Hash Result -->
-                    <div id="hash-result" class="mt-4" style="display: none;">
-                        <h4 class="text-center">Hash Result</h4>
-                        <div class="text-center">
-                            <pre id="hash-output"></pre>
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-info">
+                                        <i class="ni ni-bullet-list-67 mr-2"></i>Generate Hash
+                                    </button>
+                                </div>
+                            </form>
+
+                            <div id="hash-results" class="mt-4" style="display: none;">
+                                <div class="card bg-gradient-default shadow">
+                                    <div class="card-body">
+                                        <h4 class="text-white mb-3">Hash Results</h4>
+                                        <div class="form-group mb-0">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control hash-output" id="hash-output" readonly>
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-white" type="button" id="copy-hash">
+                                                        <i class="ni ni-single-copy-04"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -60,22 +80,9 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
-<script>
-    document.getElementById('hash-calculator-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const text = event.target.text.value;
-        const algorithm = event.target.algorithm.value;
-        fetch(`/api/hash-calculator?text=${encodeURIComponent(text)}&algorithm=${algorithm}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('hash-output').textContent = data.hash;
-                document.getElementById('hash-result').style.display = 'block';
-            })
-            .catch(error => {
-                document.getElementById('hash-output').textContent = 'Error calculating hash';
-                document.getElementById('hash-result').style.display = 'block';
-            });
-    });
-</script>
+{% block javascripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='assets/js/utilities.js') }}"></script>
 {% endblock %}

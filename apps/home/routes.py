@@ -597,3 +597,114 @@ def not_found_error(error):
 @blueprint.errorhandler(500)
 def internal_error(error):
     return render_template('home/page-500.html'), 50
+
+@blueprint.route('/generate-qr', methods=['POST'])
+def generate_qr():
+    try:
+        # Get form data
+        text = request.form.get('text')
+        size = request.form.get('size', '300')
+        
+        # Validate inputs
+        if not text:
+            return jsonify({
+                'success': False,
+                'error': 'No text provided'
+            }), 400
+
+        try:
+            size = int(size)
+            if size < 100 or size > 1000:
+                size = 300
+        except ValueError:
+            size = 300
+
+        print(f"Generating QR code for text: {text}, size: {size}")  # Debug log
+
+        # Create QR code
+        qr = qrcode.QRCode(
+            version=None,  # Auto-determine version
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        
+        # Add data and make QR code
+        qr.add_data(text)
+        qr.make(fit=True)
+
+        # Create image
+        qr_image = qr.make_image(fill_color="black", back_color="white")
+
+        # Resize if needed
+        if qr_image.size != (size, size):
+            qr_image = qr_image.resize((size, size), Image.Resampling.LANCZOS)
+
+        # Convert to base64
+        buffered = BytesIO()
+        qr_image.save(buffered, format="PNG")
+        qr_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+
+        print("QR code generated successfully")  # Debug log
+
+        return jsonify({
+            'success': True,
+            'qr_code': qr_base64
+        })
+
+    except Exception as e:
+        print(f"Error generating QR code: {str(e)}")  # Debug log
+        return jsonify({
+            'success': False,
+            'error': f'Failed to generate QR code: {str(e)}'
+        }), 400
+
+# Hash Calculator routes
+@blueprint.route('/hash-calculator')
+def hash_calculator():
+    return render_template('home/hash-calculator.html', segment='hash-calculator')
+
+@blueprint.route('/generate-hash', methods=['POST'])
+def generate_hash():
+    try:
+        text = request.form.get('text')
+        algorithm = request.form.get('algorithm', 'sha256').lower()
+        
+        if not text:
+            return jsonify({'success': False, 'error': 'No text provided'})
+
+        # Dictionary of supported hash algorithms
+        hash_functions = {
+            'md5': hashlib.md5,
+            'sha1': hashlib.sha1,
+            'sha256': hashlib.sha256,
+            'sha512': hashlib.sha512
+        }
+        
+        if algorithm not in hash_functions:
+            return jsonify({'success': False, 'error': 'Unsupported hash algorithm'})
+            
+        # Generate hash
+        hash_obj = hash_functions[algorithm]()
+        hash_obj.update(text.encode('utf-8'))
+        hash_value = hash_obj.hexdigest()
+
+        return jsonify({
+            'success': True,
+            'hash': hash_value,
+            'algorithm': algorithm
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 400
+
+# JSON Formatter route
+@blueprint.route('/json-formatter')
+def json_formatter():
+    return render_template('home/json-formatter.html', segment='json-formatter')
+
+# Note: JSON formatting is handled client-side in JavaScript,
+# so no additional backend route is needed for that functionality.

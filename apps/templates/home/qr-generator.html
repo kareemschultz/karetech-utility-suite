@@ -1,49 +1,78 @@
 {% extends "layouts/base.html" %}
 
-{% block title %}QR Generator{% endblock %}
+{% block stylesheets %}
+{{ super() }}
+<style>
+    .qr-image-container {
+        background: #f8f9fe;
+        border-radius: 0.375rem;
+        padding: 1.5rem;
+        display: inline-block;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="header bg-primary pb-6">
+<div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
     <div class="container-fluid">
         <div class="header-body">
-            <div class="row align-items-center py-4">
-                <div class="col-lg-6 col-7">
-                    <h6 class="h2 text-white d-inline-block mb-0">QR Generator</h6>
-                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
-                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-                            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
-                            <li class="breadcrumb-item active">QR Generator</li>
-                        </ol>
-                    </nav>
-                </div>
-                <div class="col-lg-6 col-5 text-right">
-                    <span class="text-white">v1.0.0 | Last updated: 25/10/2024</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container-fluid mt--6">
-    <div class="row">
-        <div class="col-xl-6 col-lg-8 col-md-10 mx-auto">
-            <div class="card bg-secondary shadow border-0">
-                <div class="card-body px-lg-5 py-lg-5">
-                    <form id="qr-generator-form" class="needs-validation" novalidate>
-                        <div class="form-group">
-                            <label class="form-control-label">Text to Encode</label>
-                            <input type="text" class="form-control" name="text" required>
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="card bg-secondary shadow">
+                        <div class="card-header bg-white border-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h3 class="mb-0">QR Code Generator</h3>
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary my-4">Generate QR Code</button>
-                        </div>
-                    </form>
+                        <div class="card-body">
+                            <form id="qr-form">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label class="form-control-label">Enter Text or URL</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">
+                                                        <i class="ni ni-align-left-2"></i>
+                                                    </span>
+                                                </div>
+                                                <input type="text" class="form-control" id="qr-input" 
+                                                       placeholder="Enter text or URL to generate QR code">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label">QR Size</label>
+                                            <select class="form-control" id="qr-size">
+                                                <option value="200">Small (200x200)</option>
+                                                <option value="300" selected>Medium (300x300)</option>
+                                                <option value="400">Large (400x400)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="ni ni-camera-compact mr-2"></i>Generate QR Code
+                                    </button>
+                                </div>
+                            </form>
 
-                    <!-- QR Code Result -->
-                    <div id="qr-result" class="mt-4" style="display: none;">
-                        <h4 class="text-center">Your QR Code</h4>
-                        <div class="text-center">
-                            <img id="qr-code" src="" alt="QR Code">
+                            <div id="qr-result" class="text-center mt-4" style="display: none;">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="qr-image-container mb-3">
+                                            <img id="qr-image" src="" alt="QR Code" class="img-fluid">
+                                        </div>
+                                        <button class="btn btn-sm btn-success" id="download-qr">
+                                            <i class="ni ni-cloud-download-95 mr-2"></i>Download QR Code
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -51,14 +80,9 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
-<script>
-    document.getElementById('qr-generator-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const text = event.target.text.value;
-        const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(text)}&size=200x200`;
-        document.getElementById('qr-code').src = qrCodeUrl;
-        document.getElementById('qr-result').style.display = 'block';
-    });
-</script>
+{% block javascripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='assets/js/utilities.js') }}"></script>
 {% endblock %}

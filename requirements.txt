@@ -17,10 +17,15 @@ werkzeug==2.0.1
 requests==2.25.1
 dnspython==2.1.0
 speedtest-cli==2.1.3
-qrcode==7.3.1
-pillow==8.3.1
+qrcode==7.4.2
+pillow==9.5.0
 python-dateutil==2.8.2
 pytz==2023.3
+
+# Cryptography and Security
+cryptography==41.0.1
+PyJWT==2.8.0
+bcrypt==4.0.1
 
 # Data handling and exports
 pandas==1.3.3
@@ -30,6 +35,10 @@ XlsxWriter==3.0.2
 reportlab==3.6.1
 pdfkit==1.0.0
 
+# JSON Processing
+jsonschema==4.17.3
+simplejson==3.19.1
+
 # Currency and formatting
 babel==2.9.1
 
@@ -38,3 +47,8 @@ python-dotenv==0.19.0
 pylint==2.9.6
 black==21.7b0
 flake8==3.9.2
+
+# Utilities
+python-magic==0.4.27
+validators==0.20.0
+humanize==4.7.0
