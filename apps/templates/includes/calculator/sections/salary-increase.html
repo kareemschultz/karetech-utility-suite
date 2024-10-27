@@ -1,4 +1,4 @@
-<!-- templates/includes/calculator/salary-increase.html -->
+<!-- templates/includes/calculator/sections/salary-increase.html -->
 <div class="card mt-4">
     <div class="card-header">
         <div class="row align-items-center">
@@ -6,7 +6,7 @@
                 <h4 class="mb-0">Calculate Salary Increase</h4>
             </div>
             <div class="col text-right">
-                <button type="button" class="btn btn-sm btn-primary" onclick="toggleIncreaseCalculator()">
+                <button type="button" class="btn btn-sm btn-primary" id="toggle-increase-calculator">
                     <i class="ni ni-bold-up mr-1"></i> Show/Hide
                 </button>
             </div>
@@ -15,21 +15,15 @@
     <div id="increase_calculator" class="card-body" style="display: none;">
         <div class="alert alert-info mb-4">
             <i class="ni ni-money-coins mr-2"></i>
-            Calculate how your salary would change with a percentage increase.
+            Use this section to calculate how your salary would change with a percentage increase. Enter the increase percentage and whether the increase is taxable, then click "Calculate Increase" to see the updated values.
         </div>
-        <form id="increase-form">
+        <form id="increase-form" onsubmit="event.preventDefault(); SalaryCalculator.calculateSalaryIncrease(event);">
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="form-control-label">Pay Increase Percentage</label>
                         <div class="input-group">
-                            <input type="number" 
-                                   class="form-control" 
-                                   id="increase_percentage" 
-                                   step="0.1" 
-                                   min="0"
-                                   required
-                                   placeholder="e.g., 5">
+                            <input type="number" class="form-control" id="increase_percentage" step="0.1" min="0" required placeholder="e.g., 5">
                             <div class="input-group-append">
                                 <span class="input-group-text">%</span>
                             </div>
@@ -62,10 +56,10 @@
     </div>
 </div>
 
-<!-- Increased Salary Results -->
+<!-- Salary Increase Results -->
 <div id="increase_results" class="card mt-4" style="display: none;">
-    <div class="card-header">
-        <h4 class="mb-0">Results with Salary Increase</h4>
+    <div class="card-header bg-gradient-info">
+        <h4 class="mb-0 text-white">Results with Salary Increase</h4>
     </div>
     <div class="card-body">
         <div class="row">
@@ -97,4 +91,12 @@
                     </div>
                 </div>
             </div>
-        </div
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h5>Updated Total Compensation</h5>
+                <p class="mb-1">New Total Compensation: $<span id="new_total_compensation">0.00</span></p>
+            </div>
+        </div>
+    </div>
+</div>

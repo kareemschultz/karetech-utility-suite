@@ -127,11 +127,86 @@ def calculate_salary():
             'success': False,
             'error': str(e)
         }), 400
-        
-        
 
+@blueprint.route('/calculate-salary-increase', methods=['POST'])
+def calculate_salary_increase():
+    try:
+        # Get the necessary data from the request
+        current_salary = float(request.form.get('current_salary'))
+        increase_percentage = float(request.form.get('increase_percentage'))
+        is_increase_taxable = request.form.get('is_increase_taxable') == 'yes'
 
+        # Calculate the new salary, deductions, and other values
+        new_gross_pay = current_salary * (1 + increase_percentage / 100)
+        new_nis_contribution = min(new_gross_pay * 0.056, 15680)
+        new_paye_tax = calculate_paye_tax(new_gross_pay, current_salary, is_increase_taxable)
+        new_total_deductions = new_nis_contribution + new_paye_tax
+        new_net_pay = new_gross_pay - new_total_deductions
+        new_total_compensation = new_gross_pay
 
+        return jsonify({
+            'success': True,
+            'data': {
+                'new_gross_pay': round(new_gross_pay, 2),
+                'new_nis': round(new_nis_contribution, 2),
+                'new_paye': round(new_paye_tax, 2),
+                'new_deductions': round(new_total_deductions, 2),
+                'new_net_pay': round(new_net_pay, 2),
+                'new_total_compensation': round(new_total_compensation, 2)
+            }
+        })
+
+    except Exception as e:
+        print(f"Error in calculate_salary_increase: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 400
+
+def calculate_paye_tax(new_gross_pay, current_salary, is_increase_taxable):
+    """
+    Calculate the PAYE tax for the new salary after the increase.
+
+    Parameters:
+    new_gross_pay (float): The new gross pay after the salary increase.
+    current_salary (float): The current gross salary before the increase.
+    is_increase_taxable (bool): Indicates whether the salary increase is taxable.
+
+    Returns:
+    float: The new PAYE tax amount.
+    """
+    try:
+        # Calculate the chargeable income with the new gross pay
+        personal_allowance = 100000
+        nis_rate = 0.056
+        nis_cap = 15680
+        nis_contribution = min(new_gross_pay * nis_rate, nis_cap)
+
+        if new_gross_pay < personal_allowance:
+            chargeable_income = 0
+            paye_tax = 0
+        else:
+            chargeable_income = new_gross_pay - personal_allowance - nis_contribution
+
+            # Calculate the PAYE tax based on the chargeable income
+            if chargeable_income <= 2400000:
+                paye_tax = chargeable_income * 0.28
+            else:
+                paye_tax = (2400000 * 0.28) + ((chargeable_income - 2400000) * 0.4)
+
+        # If the increase is not taxable, subtract the current PAYE tax from the new PAYE tax
+        if not is_increase_taxable:
+            current_chargeable_income = current_salary - personal_allowance - nis_contribution
+            if current_chargeable_income <= 2400000:
+                current_paye_tax = current_chargeable_income * 0.28
+            else:
+                current_paye_tax = (2400000 * 0.28) + ((current_chargeable_income - 2400000) * 0.4)
+            paye_tax -= current_paye_tax
+
+        return round(paye_tax, 2)
+    except Exception as e:
+        print(f"Error in calculate_paye_tax: {str(e)}")
+        return 0
 
 @blueprint.route('/vehicle-import')
 def vehicle_import():

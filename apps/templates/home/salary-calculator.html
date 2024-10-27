@@ -1,4 +1,3 @@
-<!-- templates/home/salary-calculator.html -->
 {% extends "layouts/base.html" %}
 
 {% block stylesheets %}
@@ -18,7 +17,6 @@
         padding: 1.5rem;
         margin-bottom: 1.5rem;
     }
-
     .form-section {
         background: white;
         border-radius: .375rem;
@@ -26,30 +24,25 @@
         margin-bottom: 1.5rem;
         box-shadow: 0 0 2rem 0 rgba(136,152,170,.15);
     }
-
     .results-section {
         display: none;
         margin-top: 1.5rem;
     }
-
     .list-check, .list-dash {
         list-style: none;
         padding-left: 0;
     }
-
     .list-check li, .list-dash li {
         position: relative;
         padding-left: 1.75rem;
         margin-bottom: 0.5rem;
     }
-
     .list-check li:before {
         content: '✓';
         position: absolute;
         left: 0;
         color: #2dce89;
     }
-
     .list-dash li:before {
         content: '•';
         position: absolute;
@@ -58,7 +51,6 @@
     }
 </style>
 {% endblock %}
-
 {% block content %}
 <div class="header bg-primary pb-6">
     <div class="container-fluid">
@@ -71,14 +63,11 @@
         </div>
     </div>
 </div>
-
 <div class="container-fluid mt--6">
     <!-- Load Tax Information Section -->
     {% include 'includes/calculator/sections/tax-info.html' %}
-
     <!-- Load Understanding Allowances Section -->
     {% include 'includes/calculator/sections/allowances-info.html' %}
-
     <!-- Main Calculator Form -->
     <div class="card">
         <div class="card-header bg-transparent">
@@ -100,12 +89,14 @@
             </form>
         </div>
     </div>
-
+    
     <!-- Results Section -->
     {% include 'includes/calculator/sections/results.html' %}
+    
+    <!-- Salary Increase Section -->
+    {% include 'includes/calculator/sections/salary-increase.html' %}
 </div>
 {% endblock %}
-
 {% block javascripts %}
 {{ super() }}
 <script src="{{ url_for('static', filename='assets/js/salary-calculator.js') }}"></script>

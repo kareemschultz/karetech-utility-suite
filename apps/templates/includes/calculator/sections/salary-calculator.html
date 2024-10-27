@@ -1,0 +1,72 @@
+{% extends "layouts/base.html" %}
+{% block stylesheets %} {{ super() }}
+<style>
+    .salary-increase-block {
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .salary-increase-block h2 {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .salary-increase-block .value {
+        font-size: 36px;
+        font-weight: bold;
+        color: #4CAF50;
+    }
+
+    .salary-increase-block .label {
+        font-size: 16px;
+        color: #666;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="salary-increase-block">
+                <h2>Salary Increase</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="value">${{ new_gross_pay }}</div>
+                        <div class="label">New Gross Pay</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="value">${{ new_nis_contribution }}</div>
+                        <div class="label">New NIS Contribution</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="value">${{ new_paye_tax }}</div>
+                        <div class="label">New PAYE Tax</div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="value">${{ new_total_deductions }}</div>
+                        <div class="label">New Total Deductions</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="value">${{ new_net_pay }}</div>
+                        <div class="label">New Net Pay</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="value">${{ new_total_compensation }}</div>
+                        <div class="label">New Total Compensation</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %} {{ super() }}
+{% endblock %}

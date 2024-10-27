@@ -1,5 +1,3 @@
-// Path: apps/static/js/salary-calculator.js
-
 const SalaryCalculator = {
     init() {
         console.log('Initializing SalaryCalculator...');
@@ -7,21 +5,20 @@ const SalaryCalculator = {
         this.results = document.getElementById('results');
         this.taxableInput = document.getElementById('num_taxable');
         this.nonTaxableInput = document.getElementById('num_non_taxable');
-        
+
         if (!this.form) console.error('Form not found!');
         if (!this.taxableInput) console.error('Taxable input not found!');
         if (!this.nonTaxableInput) console.error('Non-taxable input not found!');
-        
+
         this.initializeEventListeners();
         this.updateTaxThreshold();
-        
+
         console.log('Initialization complete');
     },
 
     initializeEventListeners() {
         console.log('Setting up event listeners...');
-        
-        // Form submission
+
         if (this.form) {
             this.form.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -30,7 +27,6 @@ const SalaryCalculator = {
             });
         }
 
-        // Taxable allowances
         if (this.taxableInput) {
             ['change', 'input'].forEach(event => {
                 this.taxableInput.addEventListener(event, () => {
@@ -40,7 +36,6 @@ const SalaryCalculator = {
             });
         }
 
-        // Non-taxable allowances
         if (this.nonTaxableInput) {
             ['change', 'input'].forEach(event => {
                 this.nonTaxableInput.addEventListener(event, () => {
@@ -50,7 +45,6 @@ const SalaryCalculator = {
             });
         }
 
-        // Insurance type handling
         const insuranceRadios = document.querySelectorAll('input[name="insurance_type"]');
         insuranceRadios.forEach(radio => {
             radio.addEventListener('change', () => {
@@ -59,7 +53,6 @@ const SalaryCalculator = {
             });
         });
 
-        // Children number handling
         const childrenInput = document.querySelector('input[name="num_children"]');
         if (childrenInput) {
             childrenInput.addEventListener('change', () => {
@@ -67,31 +60,36 @@ const SalaryCalculator = {
                 this.updateTaxThreshold();
             });
         }
-        
+
+        const increaseForm = document.getElementById('increase-form');
+        if (increaseForm) {
+            increaseForm.addEventListener('submit', this.calculateSalaryIncrease.bind(this));
+        }
+
+        const increaseButton = document.querySelector('#toggle-increase-calculator');
+        if (increaseButton) {
+            increaseButton.addEventListener('click', this.toggleIncreaseCalculator.bind(this));
+        }
+
         console.log('Event listeners setup complete');
     },
 
     generateAllowanceFields(type) {
         console.log(`Generating ${type} allowance fields...`);
-        
+
         const containerId = `${type}_allowances_container`;
         const container = document.getElementById(containerId);
         const input = type === 'taxable' ? this.taxableInput : this.nonTaxableInput;
-        
+
         if (!container || !input) {
             console.error(`Missing container or input for ${type} allowances`);
-            console.error('Container:', container);
-            console.error('Input:', input);
             return;
         }
-        
+
         const count = parseInt(input.value) || 0;
         console.log(`Creating ${count} ${type} allowance fields`);
-        
-        // Clear existing fields
+
         container.innerHTML = '';
-        
-        // Generate new fields
         for (let i = 0; i < count; i++) {
             const fieldHtml = `
                 <div class="form-group mt-3">
@@ -100,13 +98,7 @@ const SalaryCalculator = {
                         <div class="input-group-prepend">
                             <span class="input-group-text">$</span>
                         </div>
-                        <input type="number" 
-                               class="form-control" 
-                               name="${type}_allowance_${i}"
-                               placeholder="Enter amount"
-                               required 
-                               min="0"
-                               value="0">
+                        <input type="number" class="form-control" name="${type}_allowance_${i}" placeholder="Enter amount" required min="0" value="0">
                     </div>
                 </div>
             `;
@@ -136,10 +128,10 @@ const SalaryCalculator = {
         const baseThreshold = 100000;
         const childDeduction = 10000;
         const totalThreshold = baseThreshold + (numChildren * childDeduction);
-        
+
         console.log('Children:', numChildren);
         console.log('Total threshold:', totalThreshold);
-        
+
         const thresholdElement = document.getElementById('current_threshold');
         if (thresholdElement) {
             thresholdElement.textContent = totalThreshold.toLocaleString();
@@ -153,28 +145,22 @@ const SalaryCalculator = {
         try {
             const submitBtn = this.form.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
-            
+
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
             submitBtn.disabled = true;
 
-            // Log form data for debugging
             const formData = new FormData(this.form);
             for (let [key, value] of formData.entries()) {
                 console.log(`${key}: ${value}`);
             }
 
-            const response = await fetch('/calculate-salary', {
-                method: 'POST',
-                body: formData
-            });
-
+            const response = await fetch('/calculate-salary', { method: 'POST', body: formData });
             const data = await response.json();
             console.log('Calculation response:', data);
-            
-            if (!data.success) {
-                throw new Error(data.error || 'Calculation failed');
-            }
 
+            if (!data.success) throw new Error(data.error || 'Calculation failed');
+
+            this.currentSalary = data.data.gross_pay;
             this.displayResults(data.data);
             this.showResults();
 
@@ -196,17 +182,9 @@ const SalaryCalculator = {
         }
 
         const fields = [
-            'gross_pay',
-            'net_pay',
-            'total_deductions',
-            'nis_contribution',
-            'paye_tax',
-            'insurance_deduction',
-            'chargeable_income',
-            'personal_allowance',
-            'monthly_gratuity',
-            'semi_annual_gratuity',
-            'annual_gratuity'
+            'gross_pay', 'net_pay', 'total_deductions', 'nis_contribution', 'paye_tax',
+            'insurance_deduction', 'chargeable_income', 'personal_allowance', 'monthly_gratuity',
+            'semi_annual_gratuity', 'annual_gratuity'
         ];
 
         fields.forEach(field => {
@@ -247,18 +225,78 @@ const SalaryCalculator = {
                 </button>
             </div>
         `;
-        
+
         const container = this.form.closest('.card-body');
         if (container) {
             container.insertAdjacentHTML('afterbegin', alertHtml);
         } else {
             console.error('Form container not found');
         }
+    },
+
+    toggleIncreaseCalculator() {
+        const increaseCalculator = document.getElementById('increase_calculator');
+        increaseCalculator.style.display = increaseCalculator.style.display === 'none' ? 'block' : 'none';
+    },
+
+    async calculateSalaryIncrease(event) {
+        event.preventDefault();
+    
+        const increasePercentage = document.getElementById('increase_percentage').value;
+        const isTaxable = document.querySelector('input[name="increase_taxable"]:checked').value === 'yes';
+    
+        try {
+            const response = await fetch('/calculate-salary-increase', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ current_salary: this.currentSalary, increase_percentage: increasePercentage, is_increase_taxable: isTaxable })
+            });
+    
+                        if (!response.ok) throw new Error('Failed to calculate salary increase');
+
+            const data = await response.json();
+            console.log('Salary increase response:', data);
+
+            if (!data.success) throw new Error(data.error || 'Salary increase calculation failed');
+
+            this.displayIncreaseResults(data.data);
+        } catch (error) {
+            console.error('Error calculating salary increase:', error);
+            this.showError('An error occurred while calculating salary increase: ' + error.message);
+        }
+    },
+
+    displayIncreaseResults(data) {
+        console.log('Displaying salary increase results:', data);
+        const increaseResult = document.getElementById('increase_result');
+        if (!increaseResult) {
+            console.error('Increase result container not found');
+            return;
+        }
+
+        const increaseFields = [
+            'new_gross_pay', 'new_net_pay', 'new_total_deductions'
+        ];
+
+        increaseFields.forEach(field => {
+            const element = document.getElementById(field);
+            if (element && data[field] !== undefined) {
+                element.textContent = Number(data[field]).toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                console.log(`Updated ${field}:`, data[field]);
+            } else {
+                console.error(`Field not found or no data: ${field}`);
+            }
+        });
+
+        increaseResult.style.display = 'block';
+        console.log('Increase results displayed');
     }
 };
 
-// Initialize when DOM is loaded
+// Initialize the SalaryCalculator when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing calculator...');
     SalaryCalculator.init();
 });
