@@ -1,8 +1,99 @@
-<div id="results" class="card mt-4 p-4">
-    <h4>Calculation Results</h4>
-    <p>Total Import Duty: <span id="import-duty"></span></p>
-    <p>Total Environmental Tax: <span id="environmental-tax"></span></p>
-    <p>Total Excise Tax: <span id="excise-tax"></span></p>
-    <p>Total VAT: <span id="vat"></span></p>
-    <p><strong>Grand Total Import Cost: <span id="total-cost"></span></strong></p>
+<div id="results" style="display: none;">
+    <div class="card">
+        <div class="card-header bg-primary">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h2 class="text-white mb-0">Import Calculation Results</h2>
+                </div>
+                <div class="col text-right">
+                    <button class="btn btn-sm btn-secondary" data-currency="GYD">GYD</button>
+                    <button class="btn btn-sm btn-secondary" data-currency="USD">USD</button>
+                    <button class="btn btn-sm btn-success ml-2 btn-export">
+                        <i class="fas fa-file-export"></i> Export
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <!-- Vehicle Details -->
+            <div class="row mb-4">
+                <div class="col">
+                    <h4>Vehicle Details</h4>
+                    <table class="table table-sm">
+                        <tbody>
+                            <tr>
+                                <td>Type:</td>
+                                <td data-detail="type">-</td>
+                            </tr>
+                            <tr>
+                                <td>Age:</td>
+                                <td data-detail="age">-</td>
+                            </tr>
+                            <tr>
+                                <td>Engine:</td>
+                                <td data-detail="engine">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Cost Breakdown -->
+            <div class="cost-breakdown">
+                <!-- Base Cost -->
+                <div class="card bg-light mb-3">
+                    <div class="card-body">
+                        <h5>Car Cost (CIF)</h5>
+                        <h3 class="mb-0" data-cost="base" data-value="0">$0.00</h3>
+                    </div>
+                </div>
+
+                <!-- Import Duties -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <h5>Import Duty</h5>
+                                <h3 class="mb-0" data-cost="customs" data-value="0">$0.00</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <h5>Environmental Tax</h5>
+                                <h3 class="mb-0" data-cost="environmental" data-value="0">$0.00</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <h5>Excise Tax</h5>
+                                <h3 class="mb-0" data-cost="excise" data-value="0">$0.00</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <h5>VAT</h5>
+                                <h3 class="mb-0" data-cost="vat" data-value="0">$0.00</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Cost -->
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h4 class="text-white mb-0">Total Import Cost</h4>
+                        <h1 class="display-3 mb-0" data-cost="total" data-value="0">$0.00</h1>
+                        <small class="text-white-50">All taxes and duties included</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -12,6 +12,7 @@ import hashlib
 from io import BytesIO
 import base64
 
+
 # Dashboard route
 @blueprint.route('/')
 def index():
@@ -128,7 +129,9 @@ def calculate_salary():
         }), 400
         
         
-# apps/home/routes.py
+
+
+
 
 @blueprint.route('/vehicle-import')
 def vehicle_import():
@@ -137,104 +140,154 @@ def vehicle_import():
 @blueprint.route('/calculate-import', methods=['POST'])
 def calculate_import():
     try:
-        # Get form data
-        cif_usd = float(request.form.get('cif'))
-        exchange_rate = float(request.form.get('exchange_rate', 208.50))
-        vehicle_age = request.form.get('vehicle_age')
-        vehicle_type = request.form.get('vehicle_type')
-        propulsion = request.form.get('propulsion')
-        engine_cc = request.form.get('engine_cc')
-        plate_type = request.form.get('plate_type', 'P')
+        # Get form data with validation
+        if not request.form:
+            return jsonify({
+                'success': False,
+                'error': 'No form data provided'
+            }), 400
+
+        # Extract and validate required fields
+        try:
+            cif_usd = float(request.form.get('cif', 0))
+            exchange_rate = float(request.form.get('exchange_rate', 208.50))
+            vehicle_age = request.form.get('vehicle_age')
+            vehicle_type = request.form.get('vehicle_type')
+            propulsion = request.form.get('propulsion')
+            engine_cc = request.form.get('engine_cc')
+        except (ValueError, TypeError) as e:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid numeric value provided'
+            }), 400
+
+        # Validate required fields
+        if not all([cif_usd, vehicle_age, vehicle_type, propulsion, engine_cc]):
+            return jsonify({
+                'success': False,
+                'error': 'All fields are required'
+            }), 400
 
         # Convert CIF to GYD
-        cif_gyd = cif_usd * exchange_rate
+        cif_gyd = round(cif_usd * exchange_rate, 2)
 
-        # Electric vehicles have zero taxes
+        # Initialize variables
+        custom_duty = 0
+        excise_tax = 0
+        environmental_tax = 0
+        vat = 0
+
+        # Handle electric vehicles (zero taxes)
         if propulsion == 'electric':
             return jsonify({
                 'success': True,
                 'calculations': {
-                    'cif_gyd': round(cif_gyd, 2),
+                    'cif_gyd': cif_gyd,
+                    'custom_duty': 0,
+                    'environmental_tax': 0,
                     'excise_tax': 0,
                     'vat': 0,
-                    'custom_duty': 0,
-                    'total_cost': round(cif_gyd, 2)
+                    'total_cost': cif_gyd
                 }
             })
 
-        # Calculate based on vehicle age
+        # Calculate taxes based on vehicle age
         if vehicle_age == 'old':  # 4 years and older
-            # Calculate excise tax based on engine size for vehicles 4 years and older
-            excise_tax = calculate_old_vehicle_excise(cif_gyd, engine_cc, propulsion)
-            custom_duty = 0  # No duty for vehicles 4 years and older
-            vat = 0  # No VAT for vehicles 4 years and older
+            # Old vehicles have different calculation method
+            excise_tax = calculate_old_vehicle_excise(cif_gyd, engine_cc, propulsion, exchange_rate)
             
+            # Environmental tax applies to all vehicles except motorcycles
+            if vehicle_type != 'motorcycle':
+                environmental_tax = 5000
+            
+            # No customs duty or VAT for old vehicles
+
         else:  # Under 4 years
-            # Calculate taxes for vehicles under 4 years
-            duty_rate, excise_rate, vat_rate = get_new_vehicle_rates(engine_cc, propulsion)
+            # Get tax rates for new vehicles
+            rates = get_new_vehicle_rates(engine_cc, propulsion)
             
-            custom_duty = cif_gyd * duty_rate
-            excise_tax = (cif_gyd + custom_duty) * excise_rate
-            vat = (cif_gyd + custom_duty + excise_tax) * vat_rate
+            # Calculate each tax component
+            custom_duty = cif_gyd * rates['duty']
+            excise_tax = (cif_gyd + custom_duty) * rates['excise']
+            
+            # VAT is calculated on the total of CIF + duty + excise
+            vat = (cif_gyd + custom_duty + excise_tax) * rates['vat']
+            
+            # Environmental tax applies to all vehicles except motorcycles
+            if vehicle_type != 'motorcycle':
+                environmental_tax = 5000
 
         # Calculate total cost
-        total_cost = cif_gyd + excise_tax + vat + custom_duty
+        total_cost = cif_gyd + custom_duty + excise_tax + environmental_tax + vat
 
+        # Return formatted response
         return jsonify({
             'success': True,
             'calculations': {
                 'cif_gyd': round(cif_gyd, 2),
+                'custom_duty': round(custom_duty, 2),
+                'environmental_tax': round(environmental_tax, 2),
                 'excise_tax': round(excise_tax, 2),
                 'vat': round(vat, 2),
-                'custom_duty': round(custom_duty, 2),
                 'total_cost': round(total_cost, 2)
             }
         })
 
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
+        print(f"Error in calculate_import: {str(e)}")  # For debugging
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 400
 
-def calculate_old_vehicle_excise(cif_gyd, engine_cc, propulsion):
+def calculate_old_vehicle_excise(cif_gyd, engine_cc, propulsion, exchange_rate):
     """Calculate excise tax for vehicles 4 years and older"""
     if propulsion == 'gasoline':
         if engine_cc in ['0-1000', '1001-1500']:
-            return 800000  # Flat rate
+            return 800000
         elif engine_cc == '1501-1800':
-            return (cif_gyd + (6000 * 208.50)) * 0.3 + (6000 * 208.50)
+            return (cif_gyd + (6000 * exchange_rate)) * 0.3 + (6000 * exchange_rate)
         elif engine_cc == '1801-2000':
-            return (cif_gyd + (6500 * 208.50)) * 0.3 + (6500 * 208.50)
+            return (cif_gyd + (6500 * exchange_rate)) * 0.3 + (6500 * exchange_rate)
         elif engine_cc == '2001-3000':
-            return (cif_gyd + (13500 * 208.50)) * 0.7 + (13500 * 208.50)
+            return (cif_gyd + (13500 * exchange_rate)) * 0.7 + (13500 * exchange_rate)
         else:  # Over 3000cc
-            return (cif_gyd + (14500 * 208.50)) * 1.0 + (14500 * 208.50)
+            return (cif_gyd + (14500 * exchange_rate)) * 1.0 + (14500 * exchange_rate)
     else:  # Diesel
         if engine_cc in ['0-1000', '1001-1500']:
-            return 800000  # Flat rate
+            return 800000
         elif engine_cc in ['1501-1800', '1801-2000']:
-            return (cif_gyd + (15400 * 208.50)) * 0.3 + (15400 * 208.50)
+            return (cif_gyd + (15400 * exchange_rate)) * 0.3 + (15400 * exchange_rate)
         elif engine_cc == '2001-3000':
-            return (cif_gyd + (15400 * 208.50)) * 0.7 + (15400 * 208.50)
+            return (cif_gyd + (15400 * exchange_rate)) * 0.7 + (15400 * exchange_rate)
         else:  # Over 3000cc
-            return (cif_gyd + (17200 * 208.50)) * 1.0 + (17200 * 208.50)
+            return (cif_gyd + (17200 * exchange_rate)) * 1.0 + (17200 * exchange_rate)
 
 def get_new_vehicle_rates(engine_cc, propulsion):
-    """Get duty, excise, and VAT rates for vehicles under 4 years"""
-    if propulsion == 'gasoline':
-        if engine_cc in ['0-1000', '1001-1500']:
-            return 0.35, 0, 0.14  # duty, excise, VAT
-        elif engine_cc in ['1501-1800', '1801-2000']:
-            return 0.45, 0.10, 0.14
-        elif engine_cc == '2001-3000':
-            return 0.45, 1.10, 0.14
-        else:  # Over 3000cc
-            return 0.45, 1.40, 0.14
-    else:  # Diesel
-        if engine_cc in ['0-1000', '1001-1500']:
-            return 0.35, 0, 0.14
-        elif engine_cc == '1501-1800':
-            return 0.45, 0.10, 0.14
-        else:  # 2000cc and above
-            return 0.45, 1.10, 0.14
+    """Get tax rates for vehicles under 4 years old"""
+    rates = {
+        'gasoline': {
+            '0-1000': {'duty': 0.35, 'excise': 0, 'vat': 0.14},
+            '1001-1500': {'duty': 0.35, 'excise': 0, 'vat': 0.14},
+            '1501-1800': {'duty': 0.45, 'excise': 0.10, 'vat': 0.14},
+            '1801-2000': {'duty': 0.45, 'excise': 0.10, 'vat': 0.14},
+            '2001-3000': {'duty': 0.45, 'excise': 1.10, 'vat': 0.14},
+            '3000+': {'duty': 0.45, 'excise': 1.40, 'vat': 0.14}
+        },
+        'diesel': {
+            '0-1000': {'duty': 0.35, 'excise': 0, 'vat': 0.14},
+            '1001-1500': {'duty': 0.35, 'excise': 0, 'vat': 0.14},
+            '1501-1800': {'duty': 0.45, 'excise': 0.10, 'vat': 0.14},
+            '1801-2000': {'duty': 0.45, 'excise': 0.10, 'vat': 0.14},
+            '2001-3000': {'duty': 0.45, 'excise': 1.10, 'vat': 0.14},
+            '3000+': {'duty': 0.45, 'excise': 1.10, 'vat': 0.14}
+        }
+    }
+    
+    default_rates = {'duty': 0, 'excise': 0, 'vat': 0.14}
+    return rates.get(propulsion, {}).get(engine_cc, default_rates)
+
+
         
 # Public IP routes
 @blueprint.route('/public-ip')

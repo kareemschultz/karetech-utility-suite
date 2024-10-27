@@ -1,102 +1,266 @@
-<!-- templates/includes/vehicle-import/calculator-form.html -->
+<!-- Calculator Form Section -->
 <div class="card">
+    <div class="card-header bg-gradient-primary">
+        <h3 class="mb-0 text-white">Calculate Import Taxes</h3>
+        <p class="text-sm text-white mb-0">Enter vehicle details below to calculate import duties and taxes</p>
+    </div>
+
+    <!-- Information Alert -->
+    <div class="alert alert-primary m-3 mb-4">
+        <div class="d-flex">
+            <div class="alert-icon">
+                <i class="fas fa-info-circle fa-lg mt-1"></i>
+            </div>
+            <div class="alert-content ml-2">
+                <h4 class="alert-heading">Before You Begin</h4>
+                <p class="mb-0">Make sure you have the following information ready:</p>
+                <ul class="mb-0">
+                    <li>Vehicle's Cost, Insurance, and Freight (CIF) value in USD</li>
+                    <li>Vehicle's manufacturing date</li>
+                    <li>Engine size (in cc)</li>
+                    <li>Vehicle registration documents (if available)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <div class="card-body">
         <form id="vehicle-import-form" class="needs-validation" novalidate>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-control-label">CIF (USD)</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">$</span>
+            <!-- Cost Information Section -->
+            <div class="form-section mb-4">
+                <h4 class="mb-3">Cost Information</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-control-label" for="cif">
+                                CIF Value (USD) <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">$</span>
+                                </div>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="cif"
+                                       name="cif" 
+                                       required 
+                                       min="0"
+                                       step="0.01"
+                                       placeholder="Enter CIF value">
+                                <div class="invalid-feedback">
+                                    Please enter a valid CIF value greater than 0
+                                </div>
                             </div>
-                            <input type="number" class="form-control" name="cif" required min="0">
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                CIF includes:
+                                <ul class="mt-1 mb-0">
+                                    <li>Cost of the vehicle</li>
+                                    <li>Insurance costs</li>
+                                    <li>Freight/shipping charges</li>
+                                </ul>
+                            </small>
                         </div>
-                        <small class="form-text text-muted">Cost, Insurance, and Freight value in USD</small>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-control-label">Exchange Rate (GYD to USD)</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">$</span>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-control-label" for="exchange_rate">
+                                Exchange Rate (GYD to USD)
+                                <i class="fas fa-question-circle text-muted" 
+                                   data-toggle="tooltip" 
+                                   title="Current exchange rate from USD to GYD. Updated daily."></i>
+                            </label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">$</span>
+                                </div>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="exchange_rate"
+                                       name="exchange_rate" 
+                                       value="208.50" 
+                                       required 
+                                       min="0" 
+                                       step="0.01">
+                                <div class="invalid-feedback">
+                                    Please enter a valid exchange rate
+                                </div>
                             </div>
-                            <input type="number" class="form-control" name="exchange_rate" value="208.50" required min="0" step="0.01">
+                            <small class="form-text text-muted">
+                                <i class="fas fa-sync mr-1"></i>
+                                Default rate: 208.50 GYD = 1 USD
+                            </small>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-control-label">Age of Vehicle</label>
-                        <select class="form-control" name="vehicle_age" required>
-                            <option value="">Choose Vehicle Age</option>
-                            <option value="new">Under 4 Years</option>
-                            <option value="old">4 Years & Older</option>
-                        </select>
-                    </div>
+            <!-- Vehicle Details Section -->
+            <div class="form-section mb-4">
+                <h4 class="mb-3">Vehicle Details</h4>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Vehicle age and engine size directly affect tax rates. Please ensure accuracy.
                 </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-control-label">Vehicle Type</label>
-                        <select class="form-control" name="vehicle_type" required>
-                            <option value="">Choose Vehicle Type</option>
-                            <option value="car">Car</option>
-                            <option value="motorcycle">Motorcycle</option>
-                            <option value="single_cab">Single Cab Pickup</option>
-                            <option value="double_cab">Double Cab Pickup</option>
-                            <option value="suv">SUV</option>
-                            <option value="van">Van</option>
-                        </select>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="vehicle_age">
+                                Age of Vehicle <span class="text-danger">*</span>
+                                <i class="fas fa-question-circle text-muted" 
+                                   data-toggle="tooltip" 
+                                   title="Age is calculated from manufacturing date to January 1st of import year"></i>
+                            </label>
+                            <select class="form-control" id="vehicle_age" name="vehicle_age" required>
+                                <option value="">Choose Vehicle Age</option>
+                                <option value="new">Under 4 Years</option>
+                                <option value="old">4 Years & Older</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select the vehicle age
+                            </div>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-calendar-alt mr-1"></i>
+                                <strong>Important:</strong> 4 years = 48 months from manufacturing date
+                            </small>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-control-label">Engine Size</label>
-                        <select class="form-control" name="engine_cc" required>
-                            <option value="">Choose Engine CC</option>
-                            <option value="0-1000">0cc - 1000cc</option>
-                            <option value="1001-1500">1001cc - 1500cc</option>
-                            <option value="1501-1800">1501cc - 1800cc</option>
-                            <option value="1801-2000">1801cc - 2000cc</option>
-                            <option value="2001-3000">2001cc - 3000cc</option>
-                            <option value="3000+">Over 3000cc</option>
-                        </select>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="vehicle_type">
+                                Vehicle Type <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-control" id="vehicle_type" name="vehicle_type" required>
+                                <option value="">Choose Vehicle Type</option>
+                                <option value="car">Car</option>
+                                <option value="motorcycle">Motorcycle</option>
+                                <option value="single_cab">Single Cab Pickup</option>
+                                <option value="double_cab">Double Cab Pickup</option>
+                                <option value="suv">SUV</option>
+                                <option value="van">Van</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select a vehicle type
+                            </div>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-car mr-1"></i>
+                                Each vehicle type has specific tax rates and regulations
+                            </small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="engine_cc">
+                                Engine Size <span class="text-danger">*</span>
+                                <i class="fas fa-question-circle text-muted" 
+                                   data-toggle="tooltip" 
+                                   title="Engine size in cubic centimeters (cc) affects duty rates"></i>
+                            </label>
+                            <select class="form-control" id="engine_cc" name="engine_cc" required>
+                                <option value="">Choose Engine CC</option>
+                                <option value="0-1000">0cc - 1000cc (Small)</option>
+                                <option value="1001-1500">1001cc - 1500cc (Economy)</option>
+                                <option value="1501-1800">1501cc - 1800cc (Mid-size)</option>
+                                <option value="1801-2000">1801cc - 2000cc (Standard)</option>
+                                <option value="2001-3000">2001cc - 3000cc (Large)</option>
+                                <option value="3000+">Over 3000cc (Extra Large)</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select the engine size
+                            </div>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-tachometer-alt mr-1"></i>
+                                Larger engines typically incur higher tax rates
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-control-label">Propulsion Type</label>
-                        <select class="form-control" name="propulsion" required>
-                            <option value="">Choose Propulsion Type</option>
-                            <option value="gasoline">Gasoline</option>
-                            <option value="electric">Electric</option>
-                            <option value="diesel">Diesel</option>
-                        </select>
+            <!-- Additional Details Section -->
+            <div class="form-section mb-4">
+                <h4 class="mb-3">Additional Details</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-control-label" for="propulsion">
+                                Propulsion Type <span class="text-danger">*</span>
+                                <i class="fas fa-question-circle text-muted" 
+                                   data-toggle="tooltip" 
+                                   title="Electric vehicles are exempt from import duties"></i>
+                            </label>
+                            <select class="form-control" id="propulsion" name="propulsion" required>
+                                <option value="">Choose Propulsion Type</option>
+                                <option value="gasoline">Gasoline</option>
+                                <option value="electric">Electric</option>
+                                <option value="diesel">Diesel</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select the propulsion type
+                            </div>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-charging-station mr-1"></i>
+                                Electric vehicles enjoy special tax benefits
+                            </small>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-control-label">Plate Type</label>
-                        <select class="form-control" name="plate_type" required>
-                            <option value="P">Private (P)</option>
-                            <option value="H">Hire (H)</option>
-                        </select>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-control-label" for="plate_type">
+                                Plate Type <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-control" id="plate_type" name="plate_type" required>
+                                <option value="P">Private (P)</option>
+                                <option value="H">Hire (H)</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select the plate type
+                            </div>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-id-card mr-1"></i>
+                                Hire vehicles may have different tax implications
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary btn-lg">
-                    <i class="ni ni-calculator mr-2"></i>Calculate Import Taxes
-                </button>
+            <!-- Tax Notes -->
+            <div class="alert alert-info mb-4">
+                <h5 class="alert-heading">
+                    <i class="fas fa-lightbulb mr-2"></i>Important Notes
+                </h5>
+                <ul class="mb-0">
+                    <li>Electric vehicles are exempt from import duties and taxes</li>
+                    <li>Vehicles over 4 years old have a different tax structure</li>
+                    <li>Engine size significantly impacts duty rates</li>
+                    <li>All values are calculated based on current GRA guidelines</li>
+                </ul>
             </div>
+
+            <!-- Calculate Button -->
+            <button type="submit" class="btn btn-primary btn-lg btn-block">
+                <i class="ni ni-calculator mr-2"></i>Calculate Import Taxes
+            </button>
         </form>
     </div>
 </div>
+
+<!-- Initialize tooltips -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
+    // Form validation
+    var form = document.getElementById('vehicle-import-form');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
+</script>

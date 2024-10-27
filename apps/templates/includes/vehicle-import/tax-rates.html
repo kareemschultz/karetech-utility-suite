@@ -1,0 +1,274 @@
+<!-- templates/home/tax-rates.html -->
+<div class="section-tax-rates mt-4">
+    <div class="card">
+        <div class="card-header bg-gradient-info">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h3 class="text-white mb-0">Current Tax Rates</h3>
+                    <p class="text-white-50 mb-0">Effective January 2024</p>
+                </div>
+                <div class="col text-right">
+                    <a href="https://www.gra.gov.gy" target="_blank" class="btn btn-sm btn-white">
+                        <i class="fas fa-external-link-alt mr-2"></i>Official GRA Guidelines
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- Understanding Tax Components -->
+            <div class="alert alert-default mb-4">
+                <h5 class="text-white"><i class="fas fa-info-circle mr-2"></i>Understanding Vehicle Import Taxes</h5>
+                <div class="row mt-3">
+                    <div class="col-md-3">
+                        <div class="card card-stats mb-4 mb-xl-0">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Import Duty</h5>
+                                        <span class="h2 font-weight-bold mb-0">35-45%</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-primary text-white rounded-circle shadow">
+                                            <i class="fas fa-percentage"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-3 mb-0 text-muted text-sm">
+                                    <span class="text-nowrap">Based on CIF value</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card card-stats mb-4 mb-xl-0">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Excise Tax</h5>
+                                        <span class="h2 font-weight-bold mb-0">0-140%</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+                                            <i class="fas fa-chart-bar"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-3 mb-0 text-muted text-sm">
+                                    <span class="text-nowrap">Varies by engine size</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card card-stats mb-4 mb-xl-0">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Environmental</h5>
+                                        <span class="h2 font-weight-bold mb-0">$5,000</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-success text-white rounded-circle shadow">
+                                            <i class="fas fa-leaf"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-3 mb-0 text-muted text-sm">
+                                    <span class="text-nowrap">Fixed rate (GYD)</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card card-stats mb-4 mb-xl-0">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">VAT</h5>
+                                        <span class="h2 font-weight-bold mb-0">14%</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-info text-white rounded-circle shadow">
+                                            <i class="fas fa-calculator"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-3 mb-0 text-muted text-sm">
+                                    <span class="text-nowrap">On total taxable value</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tax Rates for New Vehicles -->
+            <div class="table-responsive mb-4">
+                <h4><i class="fas fa-car mr-2"></i>Vehicles Under 4 Years Old</h4>
+                <table class="table table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Engine Size</th>
+                            <th>Import Duty</th>
+                            <th>Excise Tax</th>
+                            <th>VAT</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-success">0cc - 1000cc</td>
+                            <td>35%</td>
+                            <td>0%</td>
+                            <td>14%</td>
+                            <td>Most economical bracket</td>
+                        </tr>
+                        <tr>
+                            <td class="text-success">1001cc - 1500cc</td>
+                            <td>35%</td>
+                            <td>0%</td>
+                            <td>14%</td>
+                            <td>Standard economy vehicles</td>
+                        </tr>
+                        <tr>
+                            <td class="text-warning">1501cc - 1800cc</td>
+                            <td>45%</td>
+                            <td>10%</td>
+                            <td>14%</td>
+                            <td>Mid-size vehicles</td>
+                        </tr>
+                        <tr>
+                            <td class="text-warning">1801cc - 2000cc</td>
+                            <td>45%</td>
+                            <td>10%</td>
+                            <td>14%</td>
+                            <td>Standard mid-size vehicles</td>
+                        </tr>
+                        <tr>
+                            <td class="text-danger">2001cc - 3000cc</td>
+                            <td>45%</td>
+                            <td>110%</td>
+                            <td>14%</td>
+                            <td>Higher capacity vehicles</td>
+                        </tr>
+                        <tr>
+                            <td class="text-danger">Over 3000cc</td>
+                            <td>45%</td>
+                            <td>140%</td>
+                            <td>14%</td>
+                            <td>Luxury/High-performance vehicles</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tax Rates for Old Vehicles -->
+            <div class="table-responsive">
+                <h4><i class="fas fa-clock mr-2"></i>Vehicles 4 Years and Older</h4>
+                <div class="alert alert-warning mb-3">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Special calculation methods apply for older vehicles
+                </div>
+                <table class="table table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Engine Size</th>
+                            <th>Base Rate (GYD)</th>
+                            <th>Additional Calculation</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-success">Up to 1500cc</td>
+                            <td>$800,000</td>
+                            <td>Fixed rate only</td>
+                            <td>Most affordable option</td>
+                        </tr>
+                        <tr>
+                            <td class="text-warning">1501cc - 1800cc</td>
+                            <td>Variable</td>
+                            <td data-toggle="tooltip" title="CIF + (6000USD × Exchange Rate) × 30% + (6000USD × Exchange Rate)">
+                                <i class="fas fa-info-circle"></i> View Formula
+                            </td>
+                            <td>Mid-range calculation</td>
+                        </tr>
+                        <tr>
+                            <td class="text-warning">1801cc - 2000cc</td>
+                            <td>Variable</td>
+                            <td data-toggle="tooltip" title="CIF + (6500USD × Exchange Rate) × 30% + (6500USD × Exchange Rate)">
+                                <i class="fas fa-info-circle"></i> View Formula
+                            </td>
+                            <td>Standard mid-size rate</td>
+                        </tr>
+                        <tr>
+                            <td class="text-danger">2001cc - 3000cc</td>
+                            <td>Variable</td>
+                            <td data-toggle="tooltip" title="CIF + (13500USD × Exchange Rate) × 70% + (13500USD × Exchange Rate)">
+                                <i class="fas fa-info-circle"></i> View Formula
+                            </td>
+                            <td>Higher tax bracket</td>
+                        </tr>
+                        <tr>
+                            <td class="text-danger">Over 3000cc</td>
+                            <td>Variable</td>
+                            <td data-toggle="tooltip" title="CIF + (14500USD × Exchange Rate) × 100% + (14500USD × Exchange Rate)">
+                                <i class="fas fa-info-circle"></i> View Formula
+                            </td>
+                            <td>Highest tax bracket</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Special Cases -->
+            <div class="row mt-4">
+                <!-- Electric Vehicles -->
+                <div class="col-md-6">
+                    <div class="card bg-gradient-success">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="icon icon-shape bg-white text-success rounded-circle shadow mr-3">
+                                    <i class="fas fa-charging-station"></i>
+                                </div>
+                                <div>
+                                    <h5 class="text-white mb-0">Electric Vehicles</h5>
+                                    <p class="text-white mb-0">100% tax exempt</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Environmental Tax -->
+                <div class="col-md-6">
+                    <div class="card bg-gradient-info">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="icon icon-shape bg-white text-info rounded-circle shadow mr-3">
+                                    <i class="fas fa-leaf"></i>
+                                </div>
+                                <div>
+                                    <h5 class="text-white mb-0">Environmental Tax</h5>
+                                    <p class="text-white mb-0">$5,000 GYD fixed rate</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="alert alert-secondary mt-4 mb-0">
+                <h5 class="alert-heading"><i class="fas fa-info-circle mr-2"></i>Important Notes</h5>
+                <ul class="mb-0">
+                    <li>Vehicle age is calculated from manufacturing date to import date</li>
+                    <li>VAT is calculated on the sum of CIF + Import Duty + Excise Tax</li>
+                    <li>Environmental tax applies to all vehicles except motorcycles</li>
+                    <li>Special rates may apply for commercial vehicles</li>
+                    <li>Exchange rates are updated regularly</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
