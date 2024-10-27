@@ -1,29 +1,44 @@
 <!-- templates/includes/calculator/sections/salary-increase.html -->
 <div class="card mt-4">
-    <div class="card-header">
+    <div class="card-header bg-gradient-info">
         <div class="row align-items-center">
             <div class="col">
-                <h4 class="mb-0">Calculate Salary Increase</h4>
+                <h3 class="mb-0 text-white">Salary Increase Calculator</h3>
             </div>
             <div class="col text-right">
-                <button type="button" class="btn btn-sm btn-primary" id="toggle-increase-calculator">
-                    <i class="ni ni-bold-up mr-1"></i> Show/Hide
+                <button type="button" class="btn btn-sm btn-white" id="toggle-increase-calculator">
+                    <i class="ni ni-bold-up mr-1"></i> Show/Hide Calculator
                 </button>
             </div>
         </div>
     </div>
+
     <div id="increase_calculator" class="card-body" style="display: none;">
         <div class="alert alert-info mb-4">
-            <i class="ni ni-money-coins mr-2"></i>
-            Use this section to calculate how your salary would change with a percentage increase. Enter the increase percentage and whether the increase is taxable, then click "Calculate Increase" to see the updated values.
+            <div class="d-flex">
+                <div class="mr-3">
+                    <i class="ni ni-money-coins text-info" style="font-size: 2rem;"></i>
+                </div>
+                <div>
+                    <h4 class="alert-heading mb-1">Calculate Your Salary Increase</h4>
+                    <p class="mb-0">Enter the percentage increase and specify whether it's taxable. The calculator will show you your new salary details including updated deductions and net pay.</p>
+                </div>
+            </div>
         </div>
-        <form id="increase-form" onsubmit="event.preventDefault(); SalaryCalculator.calculateSalaryIncrease(event);">
+
+        <form id="increase-form">
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="form-control-label">Pay Increase Percentage</label>
                         <div class="input-group">
-                            <input type="number" class="form-control" id="increase_percentage" step="0.1" min="0" required placeholder="e.g., 5">
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="increase_percentage" 
+                                   step="0.1" 
+                                   min="0" 
+                                   required 
+                                   placeholder="e.g., 5">
                             <div class="input-group-append">
                                 <span class="input-group-text">%</span>
                             </div>
@@ -33,22 +48,37 @@
                         </small>
                     </div>
                 </div>
+                
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="form-control-label">Is the increase taxable?</label>
                         <div class="custom-control custom-radio mb-2">
-                            <input type="radio" id="taxable_yes" name="increase_taxable" class="custom-control-input" value="yes" checked>
-                            <label class="custom-control-label" for="taxable_yes">Yes - Include in tax calculations</label>
+                            <input type="radio" 
+                                   id="taxable_yes" 
+                                   name="increase_taxable" 
+                                   class="custom-control-input" 
+                                   value="yes" 
+                                   checked>
+                            <label class="custom-control-label" for="taxable_yes">
+                                Yes - Include in tax calculations
+                            </label>
                         </div>
                         <div class="custom-control custom-radio">
-                            <input type="radio" id="taxable_no" name="increase_taxable" class="custom-control-input" value="no">
-                            <label class="custom-control-label" for="taxable_no">No - Exclude from tax calculations</label>
+                            <input type="radio" 
+                                   id="taxable_no" 
+                                   name="increase_taxable" 
+                                   class="custom-control-input" 
+                                   value="no">
+                            <label class="custom-control-label" for="taxable_no">
+                                No - Exclude from tax calculations
+                            </label>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="text-center">
-                <button type="submit" class="btn btn-info">
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-info btn-lg px-6">
                     <i class="ni ni-chart-bar-32 mr-2"></i>Calculate Increase
                 </button>
             </div>
@@ -56,46 +86,68 @@
     </div>
 </div>
 
-<!-- Salary Increase Results -->
+<!-- Salary Increase Results Section -->
 <div id="increase_results" class="card mt-4" style="display: none;">
-    <div class="card-header bg-gradient-info">
-        <h4 class="mb-0 text-white">Results with Salary Increase</h4>
+    <div class="card-header bg-gradient-success">
+        <h4 class="mb-0 text-white">Salary Increase Results</h4>
     </div>
     <div class="card-body">
         <div class="row">
             <div class="col-md-6">
-                <h5>Monthly Changes</h5>
-                <p class="mb-1">New Basic Salary: $<span id="new_basic_salary">0.00</span></p>
-                <p class="mb-1">New Gross Pay: $<span id="new_gross_pay">0.00</span></p>
-                <p class="mb-1">New Net Pay: $<span id="new_net_pay">0.00</span></p>
+                <div class="card card-stats mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title text-uppercase text-muted mb-0">New Gross Pay</h5>
+                                <span class="h2 font-weight-bold mb-0">$<span id="new_gross_pay">0.00</span></span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                                    <i class="ni ni-money-coins"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
             <div class="col-md-6">
-                <h5>Updated Deductions</h5>
-                <p class="mb-1">New NIS Contribution: $<span id="new_nis">0.00</span></p>
-                <p class="mb-1">New PAYE Tax: $<span id="new_paye">0.00</span></p>
-                <p class="mb-1">Total New Deductions: $<span id="new_deductions">0.00</span></p>
-            </div>
-        </div>
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <h5>Updated Gratuity</h5>
-                <div class="row">
-                    <div class="col-md-4">
-                        <p class="mb-1">Monthly: $<span id="new_monthly_gratuity">0.00</span></p>
-                    </div>
-                    <div class="col-md-4">
-                        <p class="mb-1">Semi-Annual: $<span id="new_semi_annual_gratuity">0.00</span></p>
-                    </div>
-                    <div class="col-md-4">
-                        <p class="mb-1">Annual: $<span id="new_annual_gratuity">0.00</span></p>
+                <div class="card card-stats mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title text-uppercase text-muted mb-0">New Net Pay</h5>
+                                <span class="h2 font-weight-bold mb-0">$<span id="new_net_pay">0.00</span></span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
+                                    <i class="ni ni-credit-card"></i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row mt-4">
+
+        <div class="row">
             <div class="col-md-12">
-                <h5>Updated Total Compensation</h5>
-                <p class="mb-1">New Total Compensation: $<span id="new_total_compensation">0.00</span></p>
+                <div class="card bg-gradient-default">
+                    <div class="card-body">
+                        <h5 class="text-white mb-4">Updated Deductions</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p class="text-white mb-1">New NIS: $<span id="new_nis">0.00</span></p>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="text-white mb-1">New PAYE Tax: $<span id="new_paye">0.00</span></p>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="text-white mb-1">Total Deductions: $<span id="new_deductions">0.00</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
