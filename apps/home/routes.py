@@ -1,16 +1,48 @@
 # -*- encoding: utf-8 -*-
-from flask import render_template, request, jsonify
+# Flask imports
+from flask import render_template, request, jsonify, send_file, current_app, url_for, redirect, flash, Response
 from apps.home import blueprint
 from jinja2 import TemplateNotFound
+
+# Data handling and formatting
 from decimal import Decimal, ROUND_HALF_UP
-import requests
 import json
+from datetime import datetime, timedelta
+import pytz
+
+# Network and API related
+import requests
 import dns.resolver
 import speedtest
+import socket
+from urllib.parse import urlparse
+
+# Image processing
 import qrcode
-import hashlib
+from PIL import Image
 from io import BytesIO
 import base64
+
+# Hashing and security
+import hashlib
+import hmac
+import secrets
+
+# Utility imports
+import os
+import sys
+import time
+import logging
+from functools import wraps
+
+
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 
 
 # Dashboard route
@@ -589,75 +621,168 @@ def get_exchange_rates():
             'error': str(e)
         }), 400
 
-# Error handlers
-@blueprint.errorhandler(404)
-def not_found_error(error):
-    return render_template('home/page-404.html'), 404
+def validate_qr_input(text, size):
+    """Validate QR code input parameters"""
+    errors = []
+    
+    # Validate text
+    if not text:
+        errors.append("Text content is required")
+    elif len(text) > 2000:  # Reasonable limit for QR code content
+        errors.append("Text content is too long (maximum 2000 characters)")
+        
+    # Validate size
+    try:
+        size = int(size)
+        if size < 100:
+            errors.append("Size must be at least 100 pixels")
+        elif size > 1000:
+            errors.append("Size must be no more than 1000 pixels")
+    except (ValueError, TypeError):
+        errors.append("Invalid size value")
+        
+    return errors
 
-@blueprint.errorhandler(500)
-def internal_error(error):
-    return render_template('home/page-500.html'), 50
+@blueprint.route('/qr-generator')
+def qr_generator():
+    """Render the QR code generator page"""
+    try:
+        return render_template('home/qr-generator.html', segment='qr-generator')
+    except TemplateNotFound:
+        logger.error("QR generator template not found")
+        return render_template('home/page-404.html'), 404
+    except Exception as e:
+        logger.error(f"Error rendering QR generator page: {str(e)}", exc_info=True)
+        return render_template('home/page-500.html'), 500
 
 @blueprint.route('/generate-qr', methods=['POST'])
 def generate_qr():
+    """Generate a QR code from the provided text"""
+    start_time = time.time()
+    logger.info("Starting QR code generation request")
+    
     try:
         # Get form data
-        text = request.form.get('text')
+        text = request.form.get('text', '').strip()
         size = request.form.get('size', '300')
         
+        logger.debug(f"Received request - text: {text}, size: {size}")
+        
         # Validate inputs
-        if not text:
+        errors = validate_qr_input(text, size)
+        if errors:
+            logger.warning(f"Validation failed: {', '.join(errors)}")
             return jsonify({
                 'success': False,
-                'error': 'No text provided'
+                'error': '. '.join(errors)
             }), 400
-
-        try:
-            size = int(size)
-            if size < 100 or size > 1000:
-                size = 300
-        except ValueError:
-            size = 300
-
-        print(f"Generating QR code for text: {text}, size: {size}")  # Debug log
-
-        # Create QR code
-        qr = qrcode.QRCode(
-            version=None,  # Auto-determine version
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
+            
+        # Convert size to integer after validation
+        size = int(size)
         
-        # Add data and make QR code
-        qr.add_data(text)
-        qr.make(fit=True)
-
-        # Create image
+        # Create QR code
+        try:
+            qr = qrcode.QRCode(
+                version=None,  # Auto-determine version
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(text)
+            qr.make(fit=True)
+            
+        except qrcode.exceptions.DataOverflowError:
+            logger.error("Data overflow error while generating QR code")
+            return jsonify({
+                'success': False,
+                'error': 'Text content is too large for QR code'
+            }), 400
+            
+        # Generate QR image
         qr_image = qr.make_image(fill_color="black", back_color="white")
-
-        # Resize if needed
+        
+        # Resize image if needed
         if qr_image.size != (size, size):
-            qr_image = qr_image.resize((size, size), Image.Resampling.LANCZOS)
+            try:
+                qr_image = qr_image.resize((size, size), Image.Resampling.LANCZOS)
+            except Exception as e:
+                logger.error(f"Error resizing QR image: {str(e)}")
+                return jsonify({
+                    'success': False,
+                    'error': 'Failed to resize QR code image'
+                }), 400
 
         # Convert to base64
-        buffered = BytesIO()
-        qr_image.save(buffered, format="PNG")
-        qr_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        try:
+            buffered = BytesIO()
+            qr_image.save(buffered, format="PNG", optimize=True)
+            qr_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        except Exception as e:
+            logger.error(f"Error encoding QR image: {str(e)}")
+            return jsonify({
+                'success': False,
+                'error': 'Failed to encode QR code image'
+            }), 400
 
-        print("QR code generated successfully")  # Debug log
+        # Calculate processing time
+        processing_time = round((time.time() - start_time) * 1000)  # Convert to milliseconds
+        logger.info(f"QR code generated successfully in {processing_time}ms")
 
         return jsonify({
             'success': True,
-            'qr_code': qr_base64
+            'qr_code': qr_base64,
+            'metadata': {
+                'size': size,
+                'processing_time_ms': processing_time,
+                'content_length': len(text)
+            }
         })
 
     except Exception as e:
-        print(f"Error generating QR code: {str(e)}")  # Debug log
+        logger.error(f"Unexpected error generating QR code: {str(e)}", exc_info=True)
         return jsonify({
             'success': False,
-            'error': f'Failed to generate QR code: {str(e)}'
-        }), 400
+            'error': 'An unexpected error occurred while generating the QR code'
+        }), 500
+
+@blueprint.route('/download-qr', methods=['POST'])
+def download_qr():
+    """Download the generated QR code"""
+    try:
+        qr_base64 = request.form.get('qr_code')
+        if not qr_base64:
+            return jsonify({
+                'success': False,
+                'error': 'No QR code data provided'
+            }), 400
+
+        # Decode base64 image
+        try:
+            qr_data = base64.b64decode(qr_base64)
+        except Exception as e:
+            logger.error(f"Error decoding base64 data: {str(e)}")
+            return jsonify({
+                'success': False,
+                'error': 'Invalid QR code data'
+            }), 400
+
+        # Create BytesIO object
+        buffered = BytesIO(qr_data)
+        buffered.seek(0)
+
+        return send_file(
+            buffered,
+            mimetype='image/png',
+            as_attachment=True,
+            download_name='qr-code.png'
+        )
+
+    except Exception as e:
+        logger.error(f"Error downloading QR code: {str(e)}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'error': 'Failed to download QR code'
+        }), 500
 
 # Hash Calculator routes
 @blueprint.route('/hash-calculator')
