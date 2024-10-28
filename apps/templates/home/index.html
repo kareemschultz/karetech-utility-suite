@@ -1,35 +1,261 @@
-<!-- templates/home/index.html -->
 {% extends "layouts/base.html" %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %} Dashboard {% endblock %}
+
+{% block stylesheets %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/dashboard-widgets.css') }}">
+{% endblock %}
 
 {% block content %}
-<div class="header bg-primary pb-6">
+<!-- Header -->
+<div class="header bg-gradient-primary pb-8 pt-5">
     <div class="container-fluid">
         <div class="header-body">
+            <!-- Welcome Message -->
             <div class="row align-items-center py-4">
-                <div class="col-lg-6 col-7">
-                    <h6 class="h2 text-white d-inline-block mb-0">Dashboard</h6>
+                <div class="col-lg-8 col-7">
+                    <h6 class="h2 text-white d-inline-block mb-0">Welcome to Kareem's Tech Tools</h6>
                     <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
                         <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-                            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
-                            <li class="breadcrumb-item active">Dashboard</li>
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
                         </ol>
                     </nav>
                 </div>
+                <div class="col-lg-4 col-5 text-right">
+                    <div id="live-clock" class="text-white h3 mb-0"></div>
+                    <div id="live-date" class="text-white-50"></div>
+                </div>
             </div>
-            
-            <!-- Stats Cards Section -->
-            {% include 'includes/dashboard/stats-cards.html' %}
+
+            <!-- System Stats Cards -->
+            <div class="row">
+                <!-- System Info Card -->
+                <div class="col-xl-3 col-md-6">
+                    <div class="card card-stats">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title text-uppercase text-muted mb-0">System Info</h5>
+                                    <span class="h2 font-weight-bold mb-0" id="os-info">Loading...</span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                                        <i class="ni ni-laptop"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0 text-sm">
+                                <span id="browser-info" class="text-nowrap"></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Network Status Card -->
+                <div class="col-xl-3 col-md-6">
+                    <div class="card card-stats">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Network Status</h5>
+                                    <span class="h2 font-weight-bold mb-0" id="connection-status">Checking...</span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
+                                        <i class="ni ni-world"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0 text-sm">
+                                <span id="ip-address" class="text-success mr-2"></span>
+                                <span id="connection-type"></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tools Usage Card -->
+                <div class="col-xl-3 col-md-6">
+                    <div class="card card-stats">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Tools Usage</h5>
+                                    <span class="h2 font-weight-bold mb-0" id="tools-count">12</span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
+                                        <i class="ni ni-settings"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0 text-sm">
+                                <span class="text-success mr-2">
+                                    <i class="fa fa-arrow-up"></i> Active
+                                </span>
+                                <span class="text-nowrap">All tools operational</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Activity Card -->
+                <div class="col-xl-3 col-md-6">
+                    <div class="card card-stats">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Session Info</h5>
+                                    <span class="h2 font-weight-bold mb-0" id="session-duration">00:00</span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                                        <i class="ni ni-user-run"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0 text-sm">
+                                <span id="last-activity" class="text-nowrap"></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="container-fluid mt--6">
-    <!-- Main Content -->
-    {% include 'includes/dashboard/overview-charts.html' %}
-    
-    <!-- Traffic Tables -->
-    {% include 'includes/dashboard/traffic-tables.html' %}
+<!-- Page content -->
+<div class="container-fluid mt--7">
+    <!-- Tools Overview Section -->
+    <div class="row">
+        <div class="col-xl-8 mb-5 mb-xl-0">
+            <div class="card">
+                <div class="card-header border-0">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3 class="mb-0">Popular Tools</h3>
+                        </div>
+                        <div class="col text-right">
+                            <a href="#!" class="btn btn-sm btn-primary">See all</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Tools Grid -->
+                    <div class="row" id="popular-tools-grid">
+                        <!-- Dynamic Content -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-header border-0">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3 class="mb-0">Quick Actions</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions-grid">
+                        <!-- Quick Actions Buttons -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tools Categories -->
+    <div class="row mt-4">
+        <!-- Calculators Section -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Calculators</h3>
+                </div>
+                <div class="list-group list-group-flush" id="calculators-list">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Network Tools Section -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Network Tools</h3>
+                </div>
+                <div class="list-group list-group-flush" id="network-tools-list">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Utilities Section -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Utilities</h3>
+                </div>
+                <div class="list-group list-group-flush" id="utilities-list">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity & Metrics -->
+    <div class="row mt-4">
+        <!-- Usage Metrics -->
+        <div class="col-xl-8">
+            <div class="card">
+                <div class="card-header border-0">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3 class="mb-0">Tool Usage Metrics</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="usage-metrics-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Notifications -->
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-header border-0">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3 class="mb-0">System Updates</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="system-notifications">
+                        <!-- Dynamic Content -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+<script src="{{ url_for('static', filename='assets/js/dashboard-main.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/js/dashboard-charts.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/js/dashboard-widgets.js') }}"></script>
 {% endblock %}

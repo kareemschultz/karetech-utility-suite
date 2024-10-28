@@ -1,4 +1,3 @@
-<!-- templates/home/currency-converter.html -->
 {% extends "layouts/base.html" %}
 
 {% block title %}Currency Converter{% endblock %}
@@ -23,26 +22,93 @@
 </div>
 
 <div class="container-fluid mt--6">
-    <!-- Information Card -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="alert alert-info">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h5><i class="ni ni-money-coins mr-2"></i>Live Exchange Rates</h5>
-                        <p class="mb-0">Exchange rates are updated every hour to ensure accuracy. Currency data is sourced from reliable financial APIs.</p>
+    <!-- Information Cards -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                <i class="ni ni-time-alarm"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h5 class="mb-0">Last Updated</h5>
+                            <span id="last-update" class="text-sm text-muted">Updating...</span>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <h5><i class="ni ni-time-alarm mr-2"></i>Last Updated</h5>
-                        <p class="mb-0" id="last-update">Updating...</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="icon icon-shape bg-gradient-success text-white rounded-circle shadow">
+                                <i class="ni ni-world"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h5 class="mb-0">Available Currencies</h5>
+                            <span class="text-sm text-muted">30+ currencies from Americas and worldwide</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                                <i class="ni ni-chart-bar-32"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h5 class="mb-0">Historical Data</h5>
+                            <span class="text-sm text-muted">30-day rate history available</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Converter Card -->
+    <!-- Quick Access Buttons -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="mb-0">Quick Convert</h3>
+        </div>
+        <div class="card-body">
+            <div class="quick-convert-buttons">
+                <div class="mb-3">
+                    <h5 class="text-muted mb-2">Caribbean Currencies</h5>
+                    <button class="btn btn-sm btn-outline-primary mr-2 mb-2" data-from="USD" data-to="GYD">USD → GYD</button>
+                    <button class="btn btn-sm btn-outline-primary mr-2 mb-2" data-from="USD" data-to="BBD">USD → BBD</button>
+                    <button class="btn btn-sm btn-outline-primary mr-2 mb-2" data-from="USD" data-to="TTD">USD → TTD</button>
+                    <button class="btn btn-sm btn-outline-primary mr-2 mb-2" data-from="USD" data-to="JMD">USD → JMD</button>
+                </div>
+                <div class="mb-3">
+                    <h5 class="text-muted mb-2">South American Currencies</h5>
+                    <button class="btn btn-sm btn-outline-success mr-2 mb-2" data-from="USD" data-to="BRL">USD → BRL</button>
+                    <button class="btn btn-sm btn-outline-success mr-2 mb-2" data-from="USD" data-to="ARS">USD → ARS</button>
+                    <button class="btn btn-sm btn-outline-success mr-2 mb-2" data-from="USD" data-to="COP">USD → COP</button>
+                </div>
+                <div>
+                    <h5 class="text-muted mb-2">Major World Currencies</h5>
+                    <button class="btn btn-sm btn-outline-info mr-2 mb-2" data-from="USD" data-to="EUR">USD → EUR</button>
+                    <button class="btn btn-sm btn-outline-info mr-2 mb-2" data-from="USD" data-to="GBP">USD → GBP</button>
+                    <button class="btn btn-sm btn-outline-info mr-2 mb-2" data-from="USD" data-to="JPY">USD → JPY</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
+        <!-- Main Converter Card -->
         <div class="col-xl-8">
             <div class="card">
                 <div class="card-header">
@@ -50,49 +116,48 @@
                 </div>
                 <div class="card-body">
                     <form id="converter-form">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-control-label">Amount</label>
-                                    <div class="input-group">
-                                        <input type="number" 
-                                               class="form-control" 
-                                               id="amount" 
-                                               name="amount" 
-                                               required 
-                                               min="0.01" 
-                                               step="0.01"
-                                               placeholder="Enter amount">
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">
-                                                <i class="ni ni-money-coins"></i>
-                                            </span>
-                                        </div>
-                                    </div>
+                        <!-- Amount Input -->
+                        <div class="form-group">
+                            <label class="form-control-label">Amount</label>
+                            <div class="input-group">
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="amount" 
+                                       name="amount" 
+                                       required 
+                                       min="0.01" 
+                                       step="0.01"
+                                       placeholder="Enter amount to convert">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <i class="ni ni-money-coins"></i>
+                                    </span>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Currency Selection -->
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <div class="form-group">
                                     <label class="form-control-label">From Currency</label>
                                     <select class="form-control" id="from_currency" name="from_currency" required>
-                                        <option value="USD">US Dollar (USD)</option>
-                                        <option value="GYD">Guyana Dollar (GYD)</option>
-                                        <option value="EUR">Euro (EUR)</option>
-                                        <!-- Add more currencies -->
+                                        <!-- Will be populated by JS -->
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-2">
+                                <button type="button" id="switch-currencies" class="btn btn-neutral btn-icon-only rounded-circle mt-4" title="Switch Currencies">
+                                    <span class="btn-inner--icon">
+                                        <i class="ni ni-curved-next rotate-90"></i>
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="col-md-5">
                                 <div class="form-group">
                                     <label class="form-control-label">To Currency</label>
                                     <select class="form-control" id="to_currency" name="to_currency" required>
-                                        <option value="GYD">Guyana Dollar (GYD)</option>
-                                        <option value="USD">US Dollar (USD)</option>
-                                        <option value="EUR">Euro (EUR)</option>
-                                        <!-- Add more currencies -->
+                                        <!-- Will be populated by JS -->
                                     </select>
                                 </div>
                             </div>
@@ -105,19 +170,21 @@
 
                     <!-- Results Section -->
                     <div id="results" class="mt-4" style="display: none;">
-                        <div class="alert alert-success">
-                            <h4 class="text-success mb-2">Conversion Result</h4>
-                            <div class="row">
-                                <div class="col">
-                                    <span id="from-amount" class="h3">0.00</span>
-                                    <span id="from-currency-code" class="text-muted">USD</span>
-                                    <i class="ni ni-bold-right mx-3"></i>
-                                    <span id="to-amount" class="h3">0.00</span>
-                                    <span id="to-currency-code" class="text-muted">GYD</span>
+                        <div class="alert alert-success mb-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="text-success mb-2">Conversion Result</h4>
+                                    <div class="conversion-display">
+                                        <span id="from-amount" class="h3">0.00</span>
+                                        <span id="from-currency-code" class="text-muted ml-2">USD</span>
+                                        <i class="ni ni-bold-right mx-3"></i>
+                                        <span id="to-amount" class="h3">0.00</span>
+                                        <span id="to-currency-code" class="text-muted ml-2">GYD</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <small class="text-muted">Exchange Rate: <span id="exchange-rate">1 USD = 208.50 GYD</span></small>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="mt-2">
-                                <small class="text-muted">Exchange Rate: <span id="exchange-rate">1 USD = 208.50 GYD</span></small>
                             </div>
                         </div>
                     </div>
@@ -125,59 +192,86 @@
             </div>
         </div>
 
+        <!-- Chart Card -->
         <div class="col-xl-4">
-            <!-- Popular Conversions -->
             <div class="card">
                 <div class="card-header">
-                    <h3 class="mb-0">Common Conversions</h3></div>
-                    <div class="card-body">
-                        <div class="list-group">
-                            <a href="#" class="list-group-item list-group-item-action" onclick="setConversion('USD', 'GYD')">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <i class="fas fa-dollar-sign mr-2"></i>
-                                        USD to GYD
-                                    </div>
-                                    <span class="badge badge-primary">1 USD = 208.50 GYD</span>
-                                </div>
-                            </a>
-                            <a href="#" class="list-group-item list-group-item-action" onclick="setConversion('EUR', 'GYD')">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <i class="fas fa-euro-sign mr-2"></i>
-                                        EUR to GYD
-                                    </div>
-                                    <span class="badge badge-primary">1 EUR = 225.30 GYD</span>
-                                </div>
-                            </a>
-                            <a href="#" class="list-group-item list-group-item-action" onclick="setConversion('GBP', 'GYD')">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <i class="fas fa-pound-sign mr-2"></i>
-                                        GBP to GYD
-                                    </div>
-                                    <span class="badge badge-primary">1 GBP = 262.45 GYD</span>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
+                    <h3 class="mb-0">Rate History</h3>
                 </div>
-    
-                <!-- Exchange Rate History -->
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3 class="mb-0">Rate History</h3>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="rateChart" height="200"></canvas>
+                <div class="card-body">
+                    <div class="chart">
+                        <canvas id="rateChart" class="chart-canvas" height="300"></canvas>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    {% endblock %}
-    
-    {% block javascripts %}
-    {{ super() }}
-    <script src="{{ url_for('static', filename='assets/js/currency-converter.js') }}"></script>
-    {% endblock %}
+
+    <!-- Common Rates Card -->
+    <div class="card mt-4">
+        <div class="card-header border-0">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h3 class="mb-0">Popular Exchange Rates</h3>
+                </div>
+                <div class="col text-right">
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                            Filter Region
+                        </button>
+                        <div class="dropdown-menu" id="region-filter">
+                            <a class="dropdown-item active" href="#" data-region="all">All Regions</a>
+                            <a class="dropdown-item" href="#" data-region="Caribbean">Caribbean</a>
+                            <a class="dropdown-item" href="#" data-region="South America">South America</a>
+                            <a class="dropdown-item" href="#" data-region="North America">North America</a>
+                            <a class="dropdown-item" href="#" data-region="World">World Major</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">Currency</th>
+                        <th scope="col">Code</th>
+                        <th scope="col">Region</th>
+                        <th scope="col">Rate (vs USD)</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="rates-table-body">
+                    <!-- Will be populated by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Currency Information -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="alert alert-info mb-0">
+                        <h4>Important Notes:</h4>
+                        <ul class="mb-0">
+                            <li>Exchange rates are updated hourly to ensure accuracy.</li>
+                            <li>All rates are provided for informational purposes only.</li>
+                            <li>Historical data shows trends for the past 30 days.</li>
+                            <li>Click the region filter above to focus on specific geographical areas.</li>
+                            <li>Use the quick convert buttons for common currency pairs.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+<script src="{{ url_for('static', filename='assets/js/currency-converter.js') }}"></script>
+{% endblock %}

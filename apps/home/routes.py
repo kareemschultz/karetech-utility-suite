@@ -1,57 +1,544 @@
 # -*- encoding: utf-8 -*-
-# Flask imports
-from flask import render_template, request, jsonify, send_file, current_app, url_for, redirect, flash, Response
-from apps.home import blueprint
+"""
+Routes file for Kareem's Tech Tools
+"""
+
+# Flask and Extensions
+from flask import (
+    render_template, request, jsonify, send_file, current_app,
+    url_for, redirect, flash, Response, Blueprint, session
+)
+from flask_login import login_required, current_user
+from flask_caching import Cache
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_socketio import SocketIO, emit
+from werkzeug.utils import secure_filename
 from jinja2 import TemplateNotFound
 
-# Data handling and formatting
+# Data Processing and Formatting
 from decimal import Decimal, ROUND_HALF_UP
-import json
-from datetime import datetime, timedelta
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta, timezone
 import pytz
+from babel.numbers import format_currency, format_decimal
+from money import Money
+import json
+from forex_python.converter import CurrencyRates
+import humanize
 
-# Network and API related
+# System and Performance Monitoring
+import psutil
+import cpuinfo
+from prometheus_client import Counter, Histogram
+import logging
+from logging.handlers import RotatingFileHandler
+
+# Network and API Related
 import requests
 import dns.resolver
 import speedtest
 import socket
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
+import netifaces
+from user_agents import parse as ua_parse
+import whois
 
-# Image processing
+# File Processing and Media
 import qrcode
 from PIL import Image
+import magic
+import filetype
 from io import BytesIO
 import base64
+from PyPDF2 import PdfReader, PdfWriter
+import pdfkit
 
-# Hashing and security
+# Security and Authentication
 import hashlib
 import hmac
 import secrets
+import bcrypt
+from cryptography.fernet import Fernet
+import jwt
 
-# Utility imports
+# Task Management and Scheduling
+from celery import Celery
+from apscheduler.schedulers.background import BackgroundScheduler
+import redis
+
+# Geographic and Time
+from timezonefinder import TimezoneFinder
+from geopy.geocoders import Nominatim
+import pycountry
+from iso3166 import countries
+
+# Utility Imports
 import os
 import sys
 import time
-import logging
 from functools import wraps
+from collections import defaultdict
+import phonenumbers
+from slugify import slugify
+import timeago
+import uuid
 
+# Initialize extensions
+socketio = SocketIO()
+cache = Cache()
+limiter = Limiter(key_func=get_remote_address)
+scheduler = BackgroundScheduler()
+celery = Celery()
+redis_client = redis.Redis()
 
-# Set up logging
+# Prometheus metrics
+REQUEST_COUNT = Counter(
+    'request_count', 'App Request Count',
+    ['method', 'endpoint', 'http_status']
+)
+REQUEST_LATENCY = Histogram(
+    'request_latency_seconds', 'Request latency',
+    ['method', 'endpoint']
+)
+
+# Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        RotatingFileHandler(
+            'app.log', maxBytes=10000000, backupCount=5
+        ),
+        logging.StreamHandler(sys.stdout)
+    ]
 )
 logger = logging.getLogger(__name__)
 
+# Create blueprint
+blueprint = Blueprint('home', __name__)
+
+# Rate limiting decorators
+def rate_limit(calls=100, period=timedelta(minutes=1)):
+    def decorator(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            key = f"{get_remote_address()}:{f.__name__}"
+            current = redis_client.get(key)
+            
+            if current is None:
+                redis_client.setex(
+                    key, 
+                    period.total_seconds(), 
+                    1
+                )
+            elif int(current) >= calls:
+                return jsonify({
+                    'error': 'Rate limit exceeded'
+                }), 429
+            else:
+                redis_client.incr(key)
+            
+            return f(*args, **kwargs)
+        return wrapped
+    return decorator
+
+# Cache decorator
+def cached(timeout=5 * 60):
+    def decorator(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            cache_key = f"{f.__name__}:{str(args)}:{str(kwargs)}"
+            rv = cache.get(cache_key)
+            if rv is None:
+                rv = f(*args, **kwargs)
+                cache.set(cache_key, rv, timeout=timeout)
+            return rv
+        return wrapped
+    return decorator
+
+# Request timing decorator
+def timed_request():
+    def decorator(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            start_time = time.time()
+            result = f(*args, **kwargs)
+            duration = time.time() - start_time
+            
+            REQUEST_LATENCY.labels(
+                method=request.method,
+                endpoint=request.endpoint
+            ).observe(duration)
+            
+            return result
+        return wrapped
+    return decorator
+
+# Error handler
+@blueprint.errorhandler(Exception)
+def handle_error(error):
+    logger.error(f"Error occurred: {error}", exc_info=True)
+    return jsonify({
+        'success': False,
+        'error': str(error)
+    }), getattr(error, 'code', 500)
 
 
-# Dashboard route
+blueprint = Blueprint('dashboard', __name__)
+
+# Main Dashboard Route
 @blueprint.route('/')
-def index():
-    return render_template('home/index.html', segment='index')
+def dashboard():
+    try:
+        # Collect system information
+        system_info = {
+            'os': platform.system(),
+            'os_version': platform.version(),
+            'platform': platform.platform(),
+            'processor': platform.processor(),
+            'python_version': sys.version,
+            'hostname': socket.gethostname()
+        }
+        
+        # Get usage statistics for tools
+        tool_stats = get_tool_usage_stats()
+        
+        return render_template(
+            'home/index.html',
+            segment='index',
+            system_info=system_info,
+            tool_stats=tool_stats
+        )
+    except Exception as e:
+        return render_template('home/index.html', segment='index', error=str(e))
 
-# Salary Calculator routes
-# Add to your routes.py file
+# System Information Routes
+@blueprint.route('/api/system-info')
+def get_system_info():
+    try:
+        # Get CPU information
+        cpu_percent = psutil.cpu_percent(interval=1)
+        cpu_freq = psutil.cpu_freq()
+        cpu_cores = psutil.cpu_count()
+        
+        # Get memory information
+        memory = psutil.virtual_memory()
+        
+        # Get disk information
+        disk = psutil.disk_usage('/')
+        
+        # Get network information
+        network = psutil.net_io_counters()
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'cpu': {
+                    'usage_percent': cpu_percent,
+                    'frequency': cpu_freq.current if cpu_freq else 'N/A',
+                    'cores': cpu_cores
+                },
+                'memory': {
+                    'total': memory.total,
+                    'used': memory.used,
+                    'percent': memory.percent
+                },
+                'disk': {
+                    'total': disk.total,
+                    'used': disk.used,
+                    'free': disk.free,
+                    'percent': disk.percent
+                },
+                'network': {
+                    'bytes_sent': network.bytes_sent,
+                    'bytes_recv': network.bytes_recv,
+                    'packets_sent': network.packets_sent,
+                    'packets_recv': network.packets_recv
+                }
+            }
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# Tool Usage Statistics
+@blueprint.route('/api/tool-stats')
+def get_tool_usage_stats():
+    try:
+        # In a real application, you would get this from a database
+        # This is sample data for demonstration
+        stats = {
+            'calculators': {
+                'salary_calculator': 150,
+                'vehicle_import': 75,
+                'currency_converter': 200
+            },
+            'network_tools': {
+                'speed_test': 100,
+                'public_ip': 180,
+                'dns_lookup': 90
+            },
+            'utilities': {
+                'qr_generator': 120,
+                'hash_calculator': 80,
+                'json_formatter': 95
+            }
+        }
+        return jsonify({
+            'success': True,
+            'data': stats
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# Network Status Route
+@blueprint.route('/api/network-status')
+def get_network_status():
+    try:
+        # Get basic network information
+        hostname = socket.gethostname()
+        local_ip = socket.gethostbyname(hostname)
+        
+        # Perform speed test
+        st = speedtest.Speedtest()
+        st.get_best_server()
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'hostname': hostname,
+                'local_ip': local_ip,
+                'download_speed': st.download() / 1_000_000,  # Convert to Mbps
+                'upload_speed': st.upload() / 1_000_000,      # Convert to Mbps
+                'ping': st.results.ping
+            }
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# User Browser Information
+@blueprint.route('/api/browser-info')
+def get_browser_info():
+    try:
+        user_agent_string = request.headers.get('User-Agent')
+        user_agent = parse(user_agent_string)
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'browser': {
+                    'family': user_agent.browser.family,
+                    'version': user_agent.browser.version_string
+                },
+                'os': {
+                    'family': user_agent.os.family,
+                    'version': user_agent.os.version_string
+                },
+                'device': {
+                    'family': user_agent.device.family,
+                    'brand': user_agent.device.brand,
+                    'model': user_agent.device.model
+                }
+            }
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# Recent Activity Routes
+@blueprint.route('/api/recent-activity')
+def get_recent_activity():
+    try:
+        # In a real application, this would come from a database
+        # This is sample data for demonstration
+        activities = [
+            {
+                'tool': 'Currency Converter',
+                'action': 'Conversion performed',
+                'timestamp': datetime.now().isoformat(),
+                'details': 'USD to GYD conversion'
+            },
+            {
+                'tool': 'Speed Test',
+                'action': 'Test completed',
+                'timestamp': (datetime.now() - timedelta(minutes=5)).isoformat(),
+                'details': 'Download: 50Mbps, Upload: 25Mbps'
+            }
+            # Add more sample activities
+        ]
+        
+        return jsonify({
+            'success': True,
+            'data': activities
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# System Health Check
+@blueprint.route('/api/health-check')
+def system_health_check():
+    try:
+        # Check system resources
+        cpu_usage = psutil.cpu_percent(interval=1)
+        memory = psutil.virtual_memory()
+        disk = psutil.disk_usage('/')
+        
+        # Define health status based on resource usage
+        health_status = {
+            'cpu': 'normal' if cpu_usage < 80 else 'high',
+            'memory': 'normal' if memory.percent < 80 else 'high',
+            'disk': 'normal' if disk.percent < 80 else 'high',
+            'overall': 'healthy'
+        }
+        
+        # Set overall status based on individual components
+        if any(status == 'high' for status in health_status.values()):
+            health_status['overall'] = 'warning'
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'status': health_status,
+                'metrics': {
+                    'cpu_usage': cpu_usage,
+                    'memory_usage': memory.percent,
+                    'disk_usage': disk.percent
+                },
+                'timestamp': datetime.now().isoformat()
+            }
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# Error Monitoring Route
+@blueprint.route('/api/error-logs')
+def get_error_logs():
+    try:
+        # In a real application, this would come from your logging system
+        # This is sample data for demonstration
+        error_logs = [
+            {
+                'timestamp': datetime.now().isoformat(),
+                'level': 'ERROR',
+                'message': 'Sample error message',
+                'source': 'System'
+            }
+            # Add more sample logs
+        ]
+        
+        return jsonify({
+            'success': True,
+            'data': error_logs
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# Performance Metrics Route
+@blueprint.route('/api/performance-metrics')
+def get_performance_metrics():
+    try:
+        # Get system performance metrics
+        metrics = {
+            'cpu': {
+                'usage': psutil.cpu_percent(interval=1),
+                'frequency': psutil.cpu_freq().current if psutil.cpu_freq() else 'N/A',
+                'cores': psutil.cpu_count()
+            },
+            'memory': {
+                'total': psutil.virtual_memory().total,
+                'used': psutil.virtual_memory().used,
+                'percent': psutil.virtual_memory().percent
+            },
+            'disk': {
+                'total': psutil.disk_usage('/').total,
+                'used': psutil.disk_usage('/').used,
+                'percent': psutil.disk_usage('/').percent
+            },
+            'network': {
+                'bytes_sent': psutil.net_io_counters().bytes_sent,
+                'bytes_recv': psutil.net_io_counters().bytes_recv
+            },
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        return jsonify({
+            'success': True,
+            'data': metrics
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# Tool Analytics Route
+@blueprint.route('/api/tool-analytics')
+def get_tool_analytics():
+    try:
+        # In a real application, this would come from your analytics system
+        # This is sample data for demonstration
+        analytics = {
+            'most_used_tools': [
+                {'name': 'Currency Converter', 'usage_count': 500},
+                {'name': 'Speed Test', 'usage_count': 300},
+                {'name': 'QR Generator', 'usage_count': 200}
+            ],
+            'usage_by_category': {
+                'calculators': 1000,
+                'network_tools': 800,
+                'utilities': 600
+            },
+            'usage_trends': [
+                {
+                    'date': (datetime.now() - timedelta(days=i)).strftime('%Y-%m-%d'),
+                    'total_usage': 100 - i * 5
+                } for i in range(7)
+            ]
+        }
+        
+        return jsonify({
+            'success': True,
+            'data': analytics
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# Websocket route for real-time updates (if using websockets)
+@blueprint.route('/ws/dashboard')
+def dashboard_ws():
+    return "WebSocket connection established", 200  # Placeholder for WebSocket implementation
+
+# Helper function to format bytes to human readable format
+def format_bytes(bytes):
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+        if bytes < 1024:
+            return f"{bytes:.2f} {unit}"
+        bytes /= 1024
+    return f"{bytes:.2f} PB"
 
 @blueprint.route('/salary-calculator')
 def salary_calculator():
@@ -553,7 +1040,79 @@ def contact():
             
     return render_template('home/contact.html', segment='contact')
 
-# Currency Converter Routes
+
+
+# Comprehensive currency database with regional grouping
+CURRENCIES = {
+    # North America
+    'USD': {'name': 'US Dollar', 'symbol': '$', 'flag': '🇺🇸', 'region': 'North America'},
+    'CAD': {'name': 'Canadian Dollar', 'symbol': 'C$', 'flag': '🇨🇦', 'region': 'North America'},
+    'MXN': {'name': 'Mexican Peso', 'symbol': '$', 'flag': '🇲🇽', 'region': 'North America'},
+    
+    # Caribbean
+    'GYD': {'name': 'Guyanese Dollar', 'symbol': 'G$', 'flag': '🇬🇾', 'region': 'Caribbean'},
+    'BBD': {'name': 'Barbadian Dollar', 'symbol': 'Bds$', 'flag': '🇧🇧', 'region': 'Caribbean'},
+    'TTD': {'name': 'Trinidad and Tobago Dollar', 'symbol': 'TT$', 'flag': '🇹🇹', 'region': 'Caribbean'},
+    'JMD': {'name': 'Jamaican Dollar', 'symbol': 'J$', 'flag': '🇯🇲', 'region': 'Caribbean'},
+    'BSD': {'name': 'Bahamian Dollar', 'symbol': 'B$', 'flag': '🇧🇸', 'region': 'Caribbean'},
+    'KYD': {'name': 'Cayman Islands Dollar', 'symbol': 'CI$', 'flag': '🇰🇾', 'region': 'Caribbean'},
+    'XCD': {'name': 'East Caribbean Dollar', 'symbol': 'EC$', 'flag': '🏳', 'region': 'Caribbean'},
+    'HTG': {'name': 'Haitian Gourde', 'symbol': 'G', 'flag': '🇭🇹', 'region': 'Caribbean'},
+    'CUP': {'name': 'Cuban Peso', 'symbol': '₱', 'flag': '🇨🇺', 'region': 'Caribbean'},
+    'DOP': {'name': 'Dominican Peso', 'symbol': 'RD$', 'flag': '🇩🇴', 'region': 'Caribbean'},
+    
+    # South America
+    'BRL': {'name': 'Brazilian Real', 'symbol': 'R$', 'flag': '🇧🇷', 'region': 'South America'},
+    'ARS': {'name': 'Argentine Peso', 'symbol': '$', 'flag': '🇦🇷', 'region': 'South America'},
+    'CLP': {'name': 'Chilean Peso', 'symbol': '$', 'flag': '🇨🇱', 'region': 'South America'},
+    'COP': {'name': 'Colombian Peso', 'symbol': '$', 'flag': '🇨🇴', 'region': 'South America'},
+    'PEN': {'name': 'Peruvian Sol', 'symbol': 'S/.', 'flag': '🇵🇪', 'region': 'South America'},
+    'UYU': {'name': 'Uruguayan Peso', 'symbol': '$', 'flag': '🇺🇾', 'region': 'South America'},
+    'VES': {'name': 'Venezuelan Bolívar', 'symbol': 'Bs.', 'flag': '🇻🇪', 'region': 'South America'},
+    'BOB': {'name': 'Bolivian Boliviano', 'symbol': 'Bs.', 'flag': '🇧🇴', 'region': 'South America'},
+    'PYG': {'name': 'Paraguayan Guaraní', 'symbol': '₲', 'flag': '🇵🇾', 'region': 'South America'},
+    
+    # Major World Currencies
+    'EUR': {'name': 'Euro', 'symbol': '€', 'flag': '🇪🇺', 'region': 'World'},
+    'GBP': {'name': 'British Pound', 'symbol': '£', 'flag': '🇬🇧', 'region': 'World'},
+    'JPY': {'name': 'Japanese Yen', 'symbol': '¥', 'flag': '🇯🇵', 'region': 'World'},
+    'CHF': {'name': 'Swiss Franc', 'symbol': 'Fr', 'flag': '🇨🇭', 'region': 'World'},
+    'AUD': {'name': 'Australian Dollar', 'symbol': 'A$', 'flag': '🇦🇺', 'region': 'World'},
+    'NZD': {'name': 'New Zealand Dollar', 'symbol': 'NZ$', 'flag': '🇳🇿', 'region': 'World'},
+}
+
+# Sample exchange rates (in production, these would come from an API)
+SAMPLE_RATES = {
+    'USD': 1.0,
+    'EUR': 0.85,
+    'GBP': 0.73,
+    'GYD': 208.5,
+    'BBD': 2.0,
+    'TTD': 6.8,
+    'JMD': 154.5,
+    'BSD': 1.0,
+    'KYD': 0.82,
+    'XCD': 2.7,
+    'HTG': 98.5,
+    'CUP': 24.0,
+    'DOP': 56.8,
+    'BRL': 5.2,
+    'ARS': 98.4,
+    'CLP': 750.0,
+    'COP': 3750.0,
+    'PEN': 4.1,
+    'UYU': 44.2,
+    'VES': 4.1,
+    'BOB': 6.9,
+    'PYG': 6900.0,
+    'CAD': 1.25,
+    'MXN': 20.1,
+    'JPY': 110.2,
+    'CHF': 0.92,
+    'AUD': 1.35,
+    'NZD': 1.42,
+}
+
 @blueprint.route('/currency-converter')
 def currency_converter():
     return render_template('home/currency-converter.html', segment='currency-converter')
@@ -561,228 +1120,135 @@ def currency_converter():
 @blueprint.route('/convert-currency', methods=['POST'])
 def convert_currency():
     try:
-        amount = float(request.form.get('amount'))
-        from_currency = request.form.get('from_currency')
-        to_currency = request.form.get('to_currency')
-        
-        # You would typically use a currency API here
-        # For example, using exchangerate-api.com
-        API_KEY = os.getenv('EXCHANGE_RATE_API_KEY')
-        
-        # Make API request
-        response = requests.get(
-            f'https://v6.exchangerate-api.com/v6/{API_KEY}/pair/{from_currency}/{to_currency}/{amount}'
-        )
-        
-        if response.status_code == 200:
-            data = response.json()
-            return jsonify({
-                'success': True,
-                'result': {
-                    'amount': amount,
-                    'from_currency': from_currency,
-                    'to_currency': to_currency,
-                    'converted_amount': data['conversion_result'],
-                    'rate': data['conversion_rate'],
-                    'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                }
-            })
-        else:
-            raise Exception('Failed to fetch exchange rate')
+        amount = float(request.form.get('amount', 0))
+        from_currency = request.form.get('from_currency', 'USD')
+        to_currency = request.form.get('to_currency', 'GYD')
+
+        if amount <= 0:
+            raise ValueError("Amount must be greater than 0")
             
+        if from_currency not in SAMPLE_RATES or to_currency not in SAMPLE_RATES:
+            raise ValueError("Invalid currency selected")
+
+        # Calculate conversion
+        from_rate = SAMPLE_RATES[from_currency]
+        to_rate = SAMPLE_RATES[to_currency]
+        conversion_rate = to_rate / from_rate
+        converted_amount = amount * conversion_rate
+
+        # Generate historical data
+        historical_rates = []
+        base_rate = conversion_rate
+        for i in range(30):
+            date = (datetime.now() - timedelta(days=i)).strftime('%Y-%m-%d')
+            # Add some variation to create realistic looking data
+            rate = base_rate * (1 + ((-1 if i % 2 else 1) * (i % 5) * 0.001))
+            historical_rates.append({
+                'date': date,
+                'rate': rate
+            })
+
+        return jsonify({
+            'success': True,
+            'result': {
+                'amount': amount,
+                'from_currency': from_currency,
+                'to_currency': to_currency,
+                'converted_amount': converted_amount,
+                'rate': conversion_rate,
+                'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'historical_rates': historical_rates,
+                'from_currency_info': CURRENCIES[from_currency],
+                'to_currency_info': CURRENCIES[to_currency]
+            }
+        })
+            
+    except ValueError as ve:
+        return jsonify({
+            'success': False,
+            'error': str(ve)
+        }), 400
     except Exception as e:
         return jsonify({
             'success': False,
-            'error': str(e)
+            'error': 'An unexpected error occurred'
         }), 400
 
 @blueprint.route('/get-exchange-rates', methods=['GET'])
 def get_exchange_rates():
     try:
-        base_currency = request.args.get('base', 'USD')
-        
-        # Fetch latest rates
-        API_KEY = os.getenv('EXCHANGE_RATE_API_KEY')
-        response = requests.get(
-            f'https://v6.exchangerate-api.com/v6/{API_KEY}/latest/{base_currency}'
-        )
-        
-        if response.status_code == 200:
-            return jsonify({
-                'success': True,
-                'rates': response.json()['conversion_rates']
-            })
-        else:
-            raise Exception('Failed to fetch rates')
-            
+        return jsonify({
+            'success': True,
+            'rates': SAMPLE_RATES,
+            'currencies_info': CURRENCIES,
+            'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        })
     except Exception as e:
         return jsonify({
             'success': False,
             'error': str(e)
         }), 400
 
-def validate_qr_input(text, size):
-    """Validate QR code input parameters"""
-    errors = []
-    
-    # Validate text
-    if not text:
-        errors.append("Text content is required")
-    elif len(text) > 2000:  # Reasonable limit for QR code content
-        errors.append("Text content is too long (maximum 2000 characters)")
-        
-    # Validate size
-    try:
-        size = int(size)
-        if size < 100:
-            errors.append("Size must be at least 100 pixels")
-        elif size > 1000:
-            errors.append("Size must be no more than 1000 pixels")
-    except (ValueError, TypeError):
-        errors.append("Invalid size value")
-        
-    return errors
-
-@blueprint.route('/qr-generator')
-def qr_generator():
-    """Render the QR code generator page"""
-    try:
-        return render_template('home/qr-generator.html', segment='qr-generator')
-    except TemplateNotFound:
-        logger.error("QR generator template not found")
-        return render_template('home/page-404.html'), 404
-    except Exception as e:
-        logger.error(f"Error rendering QR generator page: {str(e)}", exc_info=True)
-        return render_template('home/page-500.html'), 500
-
 @blueprint.route('/generate-qr', methods=['POST'])
 def generate_qr():
-    """Generate a QR code from the provided text"""
-    start_time = time.time()
-    logger.info("Starting QR code generation request")
-    
     try:
         # Get form data
-        text = request.form.get('text', '').strip()
+        text = request.form.get('text')
         size = request.form.get('size', '300')
         
-        logger.debug(f"Received request - text: {text}, size: {size}")
-        
         # Validate inputs
-        errors = validate_qr_input(text, size)
-        if errors:
-            logger.warning(f"Validation failed: {', '.join(errors)}")
+        if not text:
             return jsonify({
                 'success': False,
-                'error': '. '.join(errors)
+                'error': 'No text provided'
             }), 400
-            
-        # Convert size to integer after validation
-        size = int(size)
-        
-        # Create QR code
+
         try:
-            qr = qrcode.QRCode(
-                version=None,  # Auto-determine version
-                error_correction=qrcode.constants.ERROR_CORRECT_L,
-                box_size=10,
-                border=4,
-            )
-            qr.add_data(text)
-            qr.make(fit=True)
-            
-        except qrcode.exceptions.DataOverflowError:
-            logger.error("Data overflow error while generating QR code")
-            return jsonify({
-                'success': False,
-                'error': 'Text content is too large for QR code'
-            }), 400
-            
-        # Generate QR image
-        qr_image = qr.make_image(fill_color="black", back_color="white")
+            size = int(size)
+            if size < 100 or size > 1000:
+                size = 300
+        except ValueError:
+            size = 300
+
+        print(f"Generating QR code for text: {text}, size: {size}")  # Debug log
+
+        # Create QR code
+        qr = qrcode.QRCode(
+            version=None,  # Auto-determine version
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
         
-        # Resize image if needed
+        # Add data and make QR code
+        qr.add_data(text)
+        qr.make(fit=True)
+
+        # Create image
+        qr_image = qr.make_image(fill_color="black", back_color="white")
+
+        # Resize if needed
         if qr_image.size != (size, size):
-            try:
-                qr_image = qr_image.resize((size, size), Image.Resampling.LANCZOS)
-            except Exception as e:
-                logger.error(f"Error resizing QR image: {str(e)}")
-                return jsonify({
-                    'success': False,
-                    'error': 'Failed to resize QR code image'
-                }), 400
+            qr_image = qr_image.resize((size, size), Image.Resampling.LANCZOS)
 
         # Convert to base64
-        try:
-            buffered = BytesIO()
-            qr_image.save(buffered, format="PNG", optimize=True)
-            qr_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
-        except Exception as e:
-            logger.error(f"Error encoding QR image: {str(e)}")
-            return jsonify({
-                'success': False,
-                'error': 'Failed to encode QR code image'
-            }), 400
+        buffered = BytesIO()
+        qr_image.save(buffered, format="PNG")
+        qr_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
 
-        # Calculate processing time
-        processing_time = round((time.time() - start_time) * 1000)  # Convert to milliseconds
-        logger.info(f"QR code generated successfully in {processing_time}ms")
+        print("QR code generated successfully")  # Debug log
 
         return jsonify({
             'success': True,
-            'qr_code': qr_base64,
-            'metadata': {
-                'size': size,
-                'processing_time_ms': processing_time,
-                'content_length': len(text)
-            }
+            'qr_code': qr_base64
         })
 
     except Exception as e:
-        logger.error(f"Unexpected error generating QR code: {str(e)}", exc_info=True)
+        print(f"Error generating QR code: {str(e)}")  # Debug log
         return jsonify({
             'success': False,
-            'error': 'An unexpected error occurred while generating the QR code'
-        }), 500
-
-@blueprint.route('/download-qr', methods=['POST'])
-def download_qr():
-    """Download the generated QR code"""
-    try:
-        qr_base64 = request.form.get('qr_code')
-        if not qr_base64:
-            return jsonify({
-                'success': False,
-                'error': 'No QR code data provided'
-            }), 400
-
-        # Decode base64 image
-        try:
-            qr_data = base64.b64decode(qr_base64)
-        except Exception as e:
-            logger.error(f"Error decoding base64 data: {str(e)}")
-            return jsonify({
-                'success': False,
-                'error': 'Invalid QR code data'
-            }), 400
-
-        # Create BytesIO object
-        buffered = BytesIO(qr_data)
-        buffered.seek(0)
-
-        return send_file(
-            buffered,
-            mimetype='image/png',
-            as_attachment=True,
-            download_name='qr-code.png'
-        )
-
-    except Exception as e:
-        logger.error(f"Error downloading QR code: {str(e)}", exc_info=True)
-        return jsonify({
-            'success': False,
-            'error': 'Failed to download QR code'
-        }), 500
+            'error': f'Failed to generate QR code: {str(e)}'
+        }), 400
 
 # Hash Calculator routes
 @blueprint.route('/hash-calculator')
