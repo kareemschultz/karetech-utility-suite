@@ -27,6 +27,9 @@ from money import Money
 import json
 from forex_python.converter import CurrencyRates
 import humanize
+import io
+import xlsxwriter
+from weasyprint import HTML
 
 # System and Performance Monitoring
 import psutil
