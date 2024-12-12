@@ -1191,7 +1191,11 @@ def get_exchange_rates():
             'success': False,
             'error': str(e)
         }), 400
-
+@blueprint.route('/qr-generator')
+def qr_generator_page():
+    """Render the QR code generator page"""
+    return render_template('home/qr-generator.html', segment='qr-generator')
+    
 @blueprint.route('/generate-qr', methods=['POST'])
 def generate_qr():
     try:
