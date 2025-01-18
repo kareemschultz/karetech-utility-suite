@@ -5,7 +5,6 @@
             <h3 class="mb-0 text-white">Salary Calculation Results</h3>
         </div>
         
-        <!-- Main Results Cards -->
         <div class="card-body">
             <!-- Primary Metrics -->
             <div class="row">
@@ -14,7 +13,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col">
-                                    <h5 class="card-title text-uppercase text-muted mb-0">Gross Pay</h5>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Monthly Gross Pay</h5>
                                     <span class="h2 font-weight-bold mb-0">$<span id="gross_pay">0.00</span></span>
                                 </div>
                                 <div class="col-auto">
@@ -23,9 +22,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <p class="mt-3 mb-0 text-sm">
-                                <span class="text-muted">Total earnings before deductions</span>
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -35,7 +31,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col">
-                                    <h5 class="card-title text-uppercase text-muted mb-0">Net Pay</h5>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Monthly Net Pay</h5>
                                     <span class="h2 font-weight-bold mb-0">$<span id="net_pay">0.00</span></span>
                                 </div>
                                 <div class="col-auto">
@@ -44,9 +40,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <p class="mt-3 mb-0 text-sm">
-                                <span class="text-muted">Take-home pay after deductions</span>
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -56,7 +49,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col">
-                                    <h5 class="card-title text-uppercase text-muted mb-0">Total Deductions</h5>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Monthly Deductions</h5>
                                     <span class="h2 font-weight-bold mb-0">$<span id="total_deductions">0.00</span></span>
                                 </div>
                                 <div class="col-auto">
@@ -65,99 +58,100 @@
                                     </div>
                                 </div>
                             </div>
-                            <p class="mt-3 mb-0 text-sm">
-                                <span class="text-muted">Sum of all deductions</span>
-                            </p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Deductions Breakdown -->
-            <div class="card bg-gradient-default shadow">
+            <!-- Complete Package Details -->
+            <div class="card bg-gradient-success shadow">
                 <div class="card-header bg-transparent">
-                    <h3 class="mb-0 text-white">Deductions Breakdown</h3>
+                    <h3 class="text-white mb-0">Salary Package Options</h3>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="deduction-item mb-4">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon icon-sm icon-shape bg-white text-dark rounded-circle shadow mr-3">
-                                        <i class="ni ni-building"></i>
-                                    </div>
-                                    <div>
-                                        <h5 class="text-white mb-1">NIS Contribution</h5>
-                                        <h4 class="text-white mb-0">$<span id="nis_contribution">0.00</span></h4>
-                                    </div>
+                    <div class="row mb-4">
+                        <!-- Monthly Package -->
+                        <div class="col-md-3">
+                            <div class="package-card">
+                                <h5>Monthly Package</h5>
+                                <div class="mb-3">
+                                    <div class="text-sm text-muted">Net Pay</div>
+                                    <div class="package-value">$<span id="monthly_net">0.00</span></div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="text-sm text-muted">With Gratuity</div>
+                                    <div class="package-value">$<span id="net_plus_monthly">0.00</span></div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="deduction-item mb-4">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon icon-sm icon-shape bg-white text-dark rounded-circle shadow mr-3">
-                                        <i class="ni ni-collection"></i>
-                                    </div>
-                                    <div>
-                                        <h5 class="text-white mb-1">PAYE Tax</h5>
-                                        <h4 class="text-white mb-0">$<span id="paye_tax">0.00</span></h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="deduction-item mb-4">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon icon-sm icon-shape bg-white text-dark rounded-circle shadow mr-3">
-                                        <i class="ni ni-ambulance"></i>
-                                    </div>
-                                    <div>
-                                        <h5 class="text-white mb-1">Insurance</h5>
-                                        <h4 class="text-white mb-0">$<span id="insurance_deduction">0.00</span></h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Tax Information -->
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow mr-3">
-                                    <i class="ni ni-chart-pie-35"></i>
+                        <!-- Semi-Annual Package -->
+                        <div class="col-md-3">
+                            <div class="package-card">
+                                <h5>Semi-Annual Package</h5>
+                                <div class="mb-3">
+                                    <div class="text-sm text-muted">Net Pay (6 months)</div>
+                                    <div class="package-value">$<span id="semi_annual_net">0.00</span></div>
                                 </div>
-                                <div>
-                                    <h5 class="card-title text-uppercase text-muted mb-0">Chargeable Income</h5>
-                                    <span class="h3 font-weight-bold mb-0">$<span id="chargeable_income">0.00</span></span>
+                                <div class="mb-3">
+                                    <div class="text-sm text-muted">With Gratuity</div>
+                                    <div class="package-value">$<span id="net_plus_semi">0.00</span></div>
                                 </div>
                             </div>
-                            <p class="mt-3 mb-0 text-sm text-muted">
-                                Income subject to PAYE tax
-                            </p>
+                        </div>
+
+                        <!-- Annual Package -->
+                        <div class="col-md-3">
+                            <div class="package-card">
+                                <h5>Annual Package</h5>
+                                <div class="mb-3">
+                                    <div class="text-sm text-muted">Net Pay (12 months)</div>
+                                    <div class="package-value">$<span id="annual_net">0.00</span></div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="text-sm text-muted">With Gratuity</div>
+                                    <div class="package-value">$<span id="net_plus_annual">0.00</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Annual Package -->
+                        <div class="col-md-3">
+                            <div class="package-card bg-gradient-info">
+                                <h5 class="text-white">Total Annual Package</h5>
+                                <div class="mb-3">
+                                    <div class="text-sm text-white-50">Including Vacation</div>
+                                    <div class="h2 text-white">$<span id="total_annual_package">0.00</span></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="icon icon-shape bg-gradient-success text-white rounded-circle shadow mr-3">
-                                    <i class="ni ni-badge"></i>
-                                </div>
-                                <div>
-                                    <h5 class="card-title text-uppercase text-muted mb-0">Personal Allowance</h5>
-                                    <span class="h3 font-weight-bold mb-0">$<span id="personal_allowance">0.00</span></span>
-                                </div>
+
+                    <!-- Deductions Breakdown -->
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-white">
+                                <h6 class="text-uppercase">NIS Contribution</h6>
+                                <h4>$<span id="nis_contribution">0.00</span></h4>
                             </div>
-                            <p class="mt-3 mb-0 text-sm text-muted">
-                                Your tax-free allowance
-                            </p>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-white">
+                                <h6 class="text-uppercase">PAYE Tax (25%)</h6>
+                                <h4>$<span id="paye_tax">0.00</span></h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-white">
+                                <h6 class="text-uppercase">Insurance</h6>
+                                <h4>$<span id="insurance_deduction">0.00</span></h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-white">
+                                <h6 class="text-uppercase">Other Deductions</h6>
+                                <h4>$<span id="other_deductions">0.00</span></h4>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -166,35 +160,71 @@
             <!-- Gratuity Information -->
             <div class="card mt-4 bg-gradient-primary">
                 <div class="card-header bg-transparent">
-                    <h3 class="text-white mb-0">Gratuity Information</h3>
+                    <h3 class="text-white mb-0">Gratuity & Benefits</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-4">
-                            <div class="gratuity-item text-center">
-                                <div class="icon icon-shape bg-white text-primary rounded-circle shadow mx-auto mb-3">
-                                    <i class="ni ni-calendar-grid-58"></i>
-                                </div>
-                                <h5 class="text-white text-uppercase">Monthly</h5>
-                                <h3 class="text-white mb-0">$<span id="monthly_gratuity">0.00</span></h3>
+                        <div class="col-md-3">
+                            <div class="text-white text-center">
+                                <h6 class="text-uppercase">Monthly Gratuity</h6>
+                                <h3>$<span id="monthly_gratuity">0.00</span></h3>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="gratuity-item text-center">
-                                <div class="icon icon-shape bg-white text-primary rounded-circle shadow mx-auto mb-3">
-                                    <i class="ni ni-calendar-grid-58"></i>
-                                </div>
-                                <h5 class="text-white text-uppercase">Semi-Annual</h5>
-                                <h3 class="text-white mb-0">$<span id="semi_annual_gratuity">0.00</span></h3>
+                        <div class="col-md-3">
+                            <div class="text-white text-center">
+                                <h6 class="text-uppercase">Semi-Annual</h6>
+                                <h3>$<span id="semi_annual_gratuity">0.00</span></h3>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="gratuity-item text-center">
-                                <div class="icon icon-shape bg-white text-primary rounded-circle shadow mx-auto mb-3">
-                                    <i class="ni ni-calendar-grid-58"></i>
-                                </div>
-                                <h5 class="text-white text-uppercase">Annual</h5>
-                                <h3 class="text-white mb-0">$<span id="annual_gratuity">0.00</span></h3>
+                        <div class="col-md-3">
+                            <div class="text-white text-center">
+                                <h6 class="text-uppercase">Annual</h6>
+                                <h3>$<span id="annual_gratuity">0.00</span></h3>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-white text-center">
+                                <h6 class="text-uppercase">Vacation Allowance</h6>
+                                <h3>$<span id="vacation_allowance">0.00</span></h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2025 Tax Benefits -->
+            <div class="card mt-4">
+                <div class="card-header bg-gradient-success">
+                    <h3 class="text-white mb-0">2025 Tax Benefits</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h6>Tax Threshold</h6>
+                                <h3>$<span id="personal_allowance">0.00</span></h3>
+                                <small class="text-muted">Including child allowances</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h6>Overtime Tax-Free</h6>
+                                <h3>$<span id="overtime_tax_free">0.00</span></h3>
+                                <small class="text-muted">First $50,000</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h6>Second Job Tax-Free</h6>
+                                <h3>$<span id="second_job_tax_free">0.00</span></h3>
+                                <small class="text-muted">First $50,000</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h6>Child Allowances</h6>
+                                <h3>$<span id="child_allowance_total">0.00</span></h3>
+                                <small class="text-muted">$10,000 per child</small>
                             </div>
                         </div>
                     </div>

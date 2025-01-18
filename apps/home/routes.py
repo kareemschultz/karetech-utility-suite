@@ -567,6 +567,16 @@ def calculate_salary():
             allowance = float(request.form.get(f'non_taxable_allowance_{i}', 0))
             non_taxable_allowances.append(allowance)
         
+        # Get overtime details - NEW 2025
+        overtime_amount = float(request.form.get('overtime_amount', 0))
+        overtime_tax_free = min(overtime_amount, 50000)  # First $50,000 is tax-free
+        taxable_overtime = max(0, overtime_amount - overtime_tax_free)
+        
+        # Get second job income - NEW 2025
+        second_job_income = float(request.form.get('second_job_income', 0))
+        second_job_tax_free = min(second_job_income, 50000)  # First $50,000 is tax-free
+        taxable_second_job = max(0, second_job_income - second_job_tax_free)
+        
         # Get insurance details
         insurance_type = request.form.get('insurance_type')
         if insurance_type == '5':  # 3rd Party Provider
@@ -577,7 +587,7 @@ def calculate_salary():
                 '1': 0,          # No Coverage
                 '2': 1469,       # Employee Only
                 '3': 3182,       # Employee & One
-                '4': 4970       # Employee & Family
+                '4': 4970        # Employee & Family
             }
             insurance_premium = insurance_amounts.get(insurance_type, 0)
 
@@ -585,16 +595,18 @@ def calculate_salary():
         loan_deduction = float(request.form.get('loan_deduction', 0))
         gpsu_deduction = float(request.form.get('gpsu_deduction', 0))
         num_children = int(request.form.get('num_children', 0))
-
+        
         # Calculate totals
-        total_taxable_allowances = sum(taxable_allowances)
-        total_non_taxable_allowances = sum(non_taxable_allowances)
+        total_taxable_allowances = sum(taxable_allowances) + taxable_overtime + taxable_second_job
+        total_non_taxable_allowances = (sum(non_taxable_allowances) + 
+                                      overtime_tax_free + 
+                                      second_job_tax_free)
         
         # Calculate gross pay
         gross_pay = basic_salary + total_taxable_allowances + total_non_taxable_allowances
         
-        # Calculate personal allowance with children
-        personal_allowance = 100000 + (num_children * 10000)
+        # Calculate personal allowance (2025)
+        personal_allowance = 130000 + (num_children * 10000)
         
         # Calculate NIS (5.6% with cap of $15,680)
         nis_rate = 0.056
@@ -605,46 +617,79 @@ def calculate_salary():
         max_insurance = min(insurance_premium, gross_pay * 0.1, 50000)
         
         # Calculate chargeable income
-        if basic_salary < personal_allowance:
-            chargeable_income = 0
-            paye_tax = 0
-        else:
-            chargeable_income = (basic_salary - personal_allowance - nis_contribution - max_insurance)
-            
-            # Calculate PAYE tax
-            if chargeable_income <= 2400000:
-                paye_tax = chargeable_income * 0.28
-            else:
-                paye_tax = (2400000 * 0.28) + ((chargeable_income - 2400000) * 0.4)
+        chargeable_income = max(0, basic_salary + total_taxable_allowances - 
+                              personal_allowance - nis_contribution - max_insurance)
+        
+        # Calculate PAYE tax (2025 rate: 25%)
+        paye_tax = chargeable_income * 0.25
         
         # Calculate total deductions and net pay
-        total_deductions = nis_contribution + paye_tax + loan_deduction + gpsu_deduction + max_insurance
+        total_deductions = (nis_contribution + paye_tax + loan_deduction + 
+                          gpsu_deduction + max_insurance)
         net_pay = gross_pay - total_deductions
         
-        # Calculate gratuity
+        # Calculate gratuity (22.5%)
         monthly_gratuity = basic_salary * 0.225
         semi_annual_gratuity = monthly_gratuity * 6
         annual_gratuity = monthly_gratuity * 12
+        vacation_allowance = basic_salary  # One month basic salary for vacation
+
+        # Calculate combined compensations
+        monthly_net = net_pay
+        semi_annual_net = net_pay * 6
+        annual_net = net_pay * 12
+
+        net_plus_monthly = monthly_net + monthly_gratuity
+        net_plus_semi = semi_annual_net + semi_annual_gratuity
+        net_plus_annual = annual_net + annual_gratuity
+        total_annual_package = net_plus_annual + vacation_allowance
 
         return jsonify({
             'success': True,
             'data': {
+                # Basic salary information
                 'gross_pay': round(gross_pay, 2),
                 'net_pay': round(net_pay, 2),
                 'total_deductions': round(total_deductions, 2),
-                'monthly_gratuity': round(monthly_gratuity, 2),
-                'semi_annual_gratuity': round(semi_annual_gratuity, 2),
-                'annual_gratuity': round(annual_gratuity, 2),
+                
+                # Allowances and deductions
                 'personal_allowance': round(personal_allowance, 2),
                 'nis_contribution': round(nis_contribution, 2),
                 'insurance_deduction': round(max_insurance, 2),
                 'chargeable_income': round(chargeable_income, 2),
-                'paye_tax': round(paye_tax, 2)
+                'paye_tax': round(paye_tax, 2),
+                
+                # New 2025 exemptions
+                'overtime_tax_free': round(overtime_tax_free, 2),
+                'overtime_taxable': round(taxable_overtime, 2),
+                'second_job_tax_free': round(second_job_tax_free, 2),
+                'second_job_taxable': round(taxable_second_job, 2),
+                
+                # Allowance totals
+                'total_taxable_allowances': round(total_taxable_allowances, 2),
+                'total_non_taxable_allowances': round(total_non_taxable_allowances, 2),
+                
+                # Base net pay periods
+                'monthly_net': round(monthly_net, 2),
+                'semi_annual_net': round(semi_annual_net, 2),
+                'annual_net': round(annual_net, 2),
+                
+                # Gratuity information
+                'monthly_gratuity': round(monthly_gratuity, 2),
+                'semi_annual_gratuity': round(semi_annual_gratuity, 2),
+                'annual_gratuity': round(annual_gratuity, 2),
+                'vacation_allowance': round(vacation_allowance, 2),
+                
+                # Combined compensations
+                'net_plus_monthly': round(net_plus_monthly, 2),
+                'net_plus_semi': round(net_plus_semi, 2),
+                'net_plus_annual': round(net_plus_annual, 2),
+                'total_annual_package': round(total_annual_package, 2)
             }
         })
 
     except Exception as e:
-        print(f"Error in calculate_salary: {str(e)}")  # For debugging
+        print(f"Error in calculate_salary: {str(e)}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -654,27 +699,90 @@ def calculate_salary():
 def calculate_salary_increase():
     try:
         # Get the necessary data from the request
-        current_salary = float(request.form.get('current_salary'))
-        increase_percentage = float(request.form.get('increase_percentage'))
+        current_salary = float(request.form.get('current_salary', 0))
+        increase_percentage = float(request.form.get('increase_percentage', 0))
         is_increase_taxable = request.form.get('is_increase_taxable') == 'yes'
+        num_children = int(request.form.get('num_children', 0))
 
-        # Calculate the new salary, deductions, and other values
-        new_gross_pay = current_salary * (1 + increase_percentage / 100)
+        # Calculate the increase amount
+        increase_amount = current_salary * (increase_percentage / 100)
+        new_gross_pay = current_salary + increase_amount
+
+        # Calculate new NIS contribution (5.6% capped at $15,680)
         new_nis_contribution = min(new_gross_pay * 0.056, 15680)
-        new_paye_tax = calculate_paye_tax(new_gross_pay, current_salary, is_increase_taxable)
+
+        # Calculate new PAYE tax with 2025 rules
+        personal_allowance = 130000 + (num_children * 10000)  # 2025 threshold
+        
+        if is_increase_taxable:
+            chargeable_income = max(0, new_gross_pay - personal_allowance - new_nis_contribution)
+            new_paye_tax = chargeable_income * 0.25  # 2025 tax rate
+        else:
+            # Only calculate tax on the original salary
+            chargeable_income = max(0, current_salary - personal_allowance - new_nis_contribution)
+            new_paye_tax = chargeable_income * 0.25
+
+        # Calculate new gratuity (22.5%)
+        new_monthly_gratuity = new_gross_pay * 0.225
+        new_semi_annual_gratuity = new_monthly_gratuity * 6
+        new_annual_gratuity = new_monthly_gratuity * 12
+        new_vacation_allowance = new_gross_pay  # One month basic salary
+
+        # Calculate total deductions and net pay
         new_total_deductions = new_nis_contribution + new_paye_tax
         new_net_pay = new_gross_pay - new_total_deductions
-        new_total_compensation = new_gross_pay
+
+        # Calculate monthly, semi-annual, and annual net pay
+        new_monthly_net = new_net_pay
+        new_semi_annual_net = new_net_pay * 6
+        new_annual_net = new_net_pay * 12
+
+        # Calculate combined compensations
+        new_net_plus_monthly = new_monthly_net + new_monthly_gratuity
+        new_net_plus_semi = new_semi_annual_net + new_semi_annual_gratuity
+        new_net_plus_annual = new_annual_net + new_annual_gratuity
+        new_total_annual_package = new_net_plus_annual + new_vacation_allowance
+
+        # Calculate differences
+        monthly_difference = new_net_pay - (current_salary / 12)
+        annual_difference = monthly_difference * 12
 
         return jsonify({
             'success': True,
             'data': {
+                # Basic salary information
                 'new_gross_pay': round(new_gross_pay, 2),
+                'new_net_pay': round(new_net_pay, 2),
                 'new_nis': round(new_nis_contribution, 2),
                 'new_paye': round(new_paye_tax, 2),
                 'new_deductions': round(new_total_deductions, 2),
-                'new_net_pay': round(new_net_pay, 2),
-                'new_total_compensation': round(new_total_compensation, 2)
+                
+                # Increase details
+                'increase_percentage': round(increase_percentage, 2),
+                'increase_amount': round(increase_amount, 2),
+                'monthly_difference': round(monthly_difference, 2),
+                'annual_difference': round(annual_difference, 2),
+                
+                # Tax information
+                'chargeable_income': round(chargeable_income, 2),
+                'personal_allowance': round(personal_allowance, 2),
+                
+                # Net pay periods
+                'new_monthly_net': round(new_monthly_net, 2),
+                'new_semi_annual_net': round(new_semi_annual_net, 2),
+                'new_annual_net': round(new_annual_net, 2),
+                
+                # New gratuity information
+                'new_monthly_gratuity': round(new_monthly_gratuity, 2),
+                'new_semi_annual_gratuity': round(new_semi_annual_gratuity, 2),
+                'new_annual_gratuity': round(new_annual_gratuity, 2),
+                'new_vacation_allowance': round(new_vacation_allowance, 2),
+                
+                # New combined compensations
+                'new_net_plus_monthly': round(new_net_plus_monthly, 2),
+                'new_net_plus_semi': round(new_net_plus_semi, 2),
+                'new_net_plus_annual': round(new_net_plus_annual, 2),
+                'new_total_annual_package': round(new_total_annual_package, 2)
             }
         })
 
@@ -684,51 +792,6 @@ def calculate_salary_increase():
             'success': False,
             'error': str(e)
         }), 400
-
-def calculate_paye_tax(new_gross_pay, current_salary, is_increase_taxable):
-    """
-    Calculate the PAYE tax for the new salary after the increase.
-
-    Parameters:
-    new_gross_pay (float): The new gross pay after the salary increase.
-    current_salary (float): The current gross salary before the increase.
-    is_increase_taxable (bool): Indicates whether the salary increase is taxable.
-
-    Returns:
-    float: The new PAYE tax amount.
-    """
-    try:
-        # Calculate the chargeable income with the new gross pay
-        personal_allowance = 100000
-        nis_rate = 0.056
-        nis_cap = 15680
-        nis_contribution = min(new_gross_pay * nis_rate, nis_cap)
-
-        if new_gross_pay < personal_allowance:
-            chargeable_income = 0
-            paye_tax = 0
-        else:
-            chargeable_income = new_gross_pay - personal_allowance - nis_contribution
-
-            # Calculate the PAYE tax based on the chargeable income
-            if chargeable_income <= 2400000:
-                paye_tax = chargeable_income * 0.28
-            else:
-                paye_tax = (2400000 * 0.28) + ((chargeable_income - 2400000) * 0.4)
-
-        # If the increase is not taxable, subtract the current PAYE tax from the new PAYE tax
-        if not is_increase_taxable:
-            current_chargeable_income = current_salary - personal_allowance - nis_contribution
-            if current_chargeable_income <= 2400000:
-                current_paye_tax = current_chargeable_income * 0.28
-            else:
-                current_paye_tax = (2400000 * 0.28) + ((current_chargeable_income - 2400000) * 0.4)
-            paye_tax -= current_paye_tax
-
-        return round(paye_tax, 2)
-    except Exception as e:
-        print(f"Error in calculate_paye_tax: {str(e)}")
-        return 0
 
 @blueprint.route('/vehicle-import')
 def vehicle_import():

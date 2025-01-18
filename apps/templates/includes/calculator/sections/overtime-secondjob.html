@@ -1,0 +1,102 @@
+<!-- templates/includes/calculator/sections/overtime-secondjob.html -->
+<div class="form-section">
+    <h4 class="mb-4">Overtime & Additional Income</h4>
+    <div class="alert alert-success mb-4">
+        <div class="d-flex">
+            <div class="mr-3">
+                <i class="ni ni-time-alarm text-success" style="font-size: 2rem;"></i>
+            </div>
+            <div>
+                <h4 class="alert-heading mb-1">2025 Tax Exemptions</h4>
+                <p class="mb-0">First $50,000 of overtime and first $50,000 of second job income are now tax-free!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Overtime Section -->
+        <div class="col-md-6">
+            <div class="card bg-gradient-default shadow-lg">
+                <div class="card-body">
+                    <h5 class="text-white">Overtime Income</h5>
+                    <div class="form-group">
+                        <label class="form-control-label text-white">Monthly Overtime Amount</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">$</span>
+                            </div>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="overtime_amount"
+                                   name="overtime_amount" 
+                                   min="0"
+                                   value="0"
+                                   placeholder="Enter overtime amount">
+                        </div>
+                        <small class="text-white">
+                            First $50,000 is tax-free for 2025
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Second Job Section -->
+        <div class="col-md-6">
+            <div class="card bg-gradient-info shadow-lg">
+                <div class="card-body">
+                    <h5 class="text-white">Second Job Income</h5>
+                    <div class="form-group">
+                        <label class="form-control-label text-white">Monthly Second Job Amount</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">$</span>
+                            </div>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="second_job_income"
+                                   name="second_job_income" 
+                                   min="0"
+                                   value="0"
+                                   placeholder="Enter second job income">
+                        </div>
+                        <small class="text-white">
+                            First $50,000 is tax-free for 2025
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tax Calculation Preview -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-gradient-light">
+                <div class="card-body">
+                    <h5>Tax-Free Portions</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div id="overtime_preview" class="d-none">
+                                <p class="mb-1">Overtime Breakdown:</p>
+                                <ul class="list-unstyled pl-3">
+                                    <li>Tax-free amount: $<span id="overtime_tax_free">0.00</span></li>
+                                    <li>Taxable amount: $<span id="overtime_taxable">0.00</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="second_job_preview" class="d-none">
+                                <p class="mb-1">Second Job Breakdown:</p>
+                                <ul class="list-unstyled pl-3">
+                                    <li>Tax-free amount: $<span id="second_job_tax_free">0.00</span></li>
+                                    <li>Taxable amount: $<span id="second_job_taxable">0.00</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

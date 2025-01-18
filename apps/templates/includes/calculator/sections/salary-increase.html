@@ -21,7 +21,7 @@
                 </div>
                 <div>
                     <h4 class="alert-heading mb-1">Calculate Your Salary Increase</h4>
-                    <p class="mb-0">Enter the percentage increase and specify whether it's taxable. The calculator will show you your new salary details including updated deductions and net pay.</p>
+                    <p class="mb-0">Enter the increase amount to see how it affects your take-home pay with 2025 tax rates.</p>
                 </div>
             </div>
         </div>
@@ -30,21 +30,19 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="form-control-label">Pay Increase Percentage</label>
+                        <label class="form-control-label">Increase Amount</label>
                         <div class="input-group">
-                            <input type="number" 
-                                   class="form-control" 
-                                   id="increase_percentage" 
-                                   step="0.1" 
-                                   min="0" 
-                                   required 
-                                   placeholder="e.g., 5">
-                            <div class="input-group-append">
-                                <span class="input-group-text">%</span>
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">$</span>
                             </div>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="custom_increase" 
+                                   required 
+                                   placeholder="Enter increase amount">
                         </div>
                         <small class="form-text text-muted">
-                            Enter the percentage increase you'd like to calculate
+                            Enter the amount you want to add to your current salary
                         </small>
                     </div>
                 </div>
@@ -116,12 +114,12 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
-                                <h5 class="card-title text-uppercase text-muted mb-0">New Net Pay</h5>
-                                <span class="h2 font-weight-bold mb-0">$<span id="new_net_pay">0.00</span></span>
+                                <h5 class="card-title text-uppercase text-muted mb-0">Monthly Increase</h5>
+                                <span class="h2 font-weight-bold mb-0">$<span id="actual_increase">0.00</span></span>
                             </div>
                             <div class="col-auto">
                                 <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
-                                    <i class="ni ni-credit-card"></i>
+                                    <i class="ni ni-chart-bar-32"></i>
                                 </div>
                             </div>
                         </div>
@@ -130,25 +128,29 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card bg-gradient-default">
-                    <div class="card-body">
-                        <h5 class="text-white mb-4">Updated Deductions</h5>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <p class="text-white mb-1">New NIS: $<span id="new_nis">0.00</span></p>
-                            </div>
-                            <div class="col-md-4">
-                                <p class="text-white mb-1">New PAYE Tax: $<span id="new_paye">0.00</span></p>
-                            </div>
-                            <div class="col-md-4">
-                                <p class="text-white mb-1">Total Deductions: $<span id="new_deductions">0.00</span></p>
-                            </div>
-                        </div>
+        <div class="card bg-gradient-default">
+            <div class="card-body">
+                <h5 class="text-white mb-4">New Salary Details</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <p class="text-white mb-1">New NIS: $<span id="new_nis">0.00</span></p>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="text-white mb-1">New PAYE Tax: $<span id="new_paye">0.00</span></p>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="text-white mb-1">Total Deductions: $<span id="new_deductions">0.00</span></p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <p class="text-white mb-1">Net Take-Home Pay: $<span id="new_net_pay">0.00</span></p>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Increase Summary -->
+        <div id="increase_summary" class="mt-4"></div>
     </div>
 </div>

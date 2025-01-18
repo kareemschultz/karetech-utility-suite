@@ -17,6 +17,7 @@
         padding: 1.5rem;
         margin-bottom: 1.5rem;
     }
+
     .form-section {
         background: white;
         border-radius: .375rem;
@@ -24,33 +25,84 @@
         margin-bottom: 1.5rem;
         box-shadow: 0 0 2rem 0 rgba(136,152,170,.15);
     }
+
     .results-section {
         display: none;
         margin-top: 1.5rem;
     }
+
     .list-check, .list-dash {
         list-style: none;
         padding-left: 0;
     }
+
     .list-check li, .list-dash li {
         position: relative;
         padding-left: 1.75rem;
         margin-bottom: 0.5rem;
     }
+
     .list-check li:before {
         content: '✓';
         position: absolute;
         left: 0;
         color: #2dce89;
     }
+
     .list-dash li:before {
         content: '•';
         position: absolute;
         left: 0;
         color: #fb6340;
     }
+
+    .salary-package {
+        background: #f8f9fe;
+        border-radius: .375rem;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: transform .2s;
+    }
+
+    .salary-package:hover {
+        transform: translateY(-5px);
+    }
+
+    .gratuity-details {
+        border-left: 4px solid #5e72e4;
+        padding-left: 1rem;
+    }
+
+    .highlight-2025 {
+        background: linear-gradient(87deg, #2dce89 0, #2dcecc 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: .375rem;
+        margin-bottom: 1rem;
+    }
+
+    .package-card {
+        background: white;
+        border-radius: .375rem;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 0 1rem 0 rgba(136,152,170,.1);
+    }
+
+    .package-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #5e72e4;
+    }
+
+    .package-label {
+        font-size: 0.875rem;
+        color: #8898aa;
+        text-transform: uppercase;
+    }
 </style>
 {% endblock %}
+
 {% block content %}
 <div class="header bg-primary pb-6">
     <div class="container-fluid">
@@ -58,16 +110,50 @@
             <div class="row align-items-center py-4">
                 <div class="col-lg-6 col-7">
                     <h6 class="h2 text-white d-inline-block mb-0">Salary Calculator</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Salary Calculator</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- 2025 Updates Banner -->
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="highlight-2025">
+                        <h3 class="text-white mb-3">2025 Updates</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled mb-0">
+                                    <li><i class="ni ni-check-bold mr-2"></i>New tax threshold: $130,000</li>
+                                    <li><i class="ni ni-check-bold mr-2"></i>Reduced tax rate: 25% flat rate</li>
+                                    <li><i class="ni ni-check-bold mr-2"></i>Child allowance: $10,000 per child</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled mb-0">
+                                    <li><i class="ni ni-check-bold mr-2"></i>First $50,000 of overtime tax-free</li>
+                                    <li><i class="ni ni-check-bold mr-2"></i>First $50,000 of second job income tax-free</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Page content -->
 <div class="container-fluid mt--6">
     <!-- Load Tax Information Section -->
     {% include 'includes/calculator/sections/tax-info.html' %}
+
     <!-- Load Understanding Allowances Section -->
     {% include 'includes/calculator/sections/allowances-info.html' %}
+
     <!-- Main Calculator Form -->
     <div class="card">
         <div class="card-header bg-transparent">
@@ -77,13 +163,13 @@
             <form id="salary-form" class="needs-validation" novalidate>
                 {% include 'includes/calculator/sections/basic-info.html' %}
                 {% include 'includes/calculator/sections/allowances.html' %}
+                {% include 'includes/calculator/sections/overtime-secondjob.html' %}
                 {% include 'includes/calculator/sections/insurance-dependents.html' %}
                 {% include 'includes/calculator/sections/deductions.html' %}
                 
                 <div class="text-center">
                     <button type="submit" class="btn btn-primary btn-lg px-6">
-                        <i class="ni ni-chart-bar-32 mr-2"></i>
-                        Calculate Salary
+                        <i class="ni ni-chart-bar-32 mr-2"></i>Calculate Salary
                     </button>
                 </div>
             </form>
@@ -97,7 +183,10 @@
     {% include 'includes/calculator/sections/salary-increase.html' %}
 </div>
 {% endblock %}
+
 {% block javascripts %}
 {{ super() }}
+<!-- Calculator specific JavaScript -->
 <script src="{{ url_for('static', filename='assets/js/salary-calculator.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/js/salary-increase-calculator.js') }}"></script>
 {% endblock %}
